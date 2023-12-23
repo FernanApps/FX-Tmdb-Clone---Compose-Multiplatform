@@ -8,9 +8,11 @@ jobs:
   test-and-build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2.3.1
-
+      - name: Checkout private tools
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.ATOKEN }}
+          
       - uses: actions/cache@v2
         with:
           path: |
