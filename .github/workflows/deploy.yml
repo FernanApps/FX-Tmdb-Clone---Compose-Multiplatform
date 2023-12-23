@@ -3,7 +3,7 @@ name: Test -> Production Build -> Deploy
 on:
   push:
     branches:
-      - master
+      - main
 jobs:
   test-and-build-and-deploy:
     runs-on: ubuntu-latest
