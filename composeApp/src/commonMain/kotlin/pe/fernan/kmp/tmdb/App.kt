@@ -1,0 +1,508 @@
+package pe.fernan.kmp.tmdb
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.DpOffset
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import io.github.aakira.napier.DebugAntilog
+import io.github.aakira.napier.Napier
+import moe.tlaster.precompose.PreComposeApp
+import org.jetbrains.compose.resources.ExperimentalResourceApi
+import pe.fernan.kmp.tmdb.di.AppModule
+import pe.fernan.kmp.tmdb.domain.model.Result
+import pe.fernan.kmp.tmdb.theme.AppTheme
+import pe.fernan.kmp.tmdb.theme.LocalWindowSizeClass
+import pe.fernan.kmp.tmdb.ui.components.CardHorizontalPoster
+import pe.fernan.kmp.tmdb.ui.ext.dpToPx
+import pe.fernan.kmp.tmdb.ui.home.HeaderTitleItem
+import pe.fernan.kmp.tmdb.ui.home.HomeScreen
+import pe.fernan.kmp.tmdb.utils.toModel
+
+
+@OptIn(
+    ExperimentalMaterial3Api::class,
+    ExperimentalMaterial3WindowSizeClassApi::class,
+    ExperimentalResourceApi::class
+)
+val paddingInternal: Dp
+    @Composable get() = when (LocalWindowSizeClass.current.widthSizeClass) {
+        WindowWidthSizeClass.Expanded -> 40.dp
+        WindowWidthSizeClass.Medium -> 25.dp
+        else -> // WindowWidthSizeClass.Compact
+            15.dp
+    }
+
+val titleTextStyle: TextStyle
+    @Composable get() = when (LocalWindowSizeClass.current.widthSizeClass) {
+        WindowWidthSizeClass.Expanded -> MaterialTheme.typography.displayMedium
+        WindowWidthSizeClass.Medium -> MaterialTheme.typography.headlineLarge
+        else -> // WindowWidthSizeClass.Compact
+            MaterialTheme.typography.headlineSmall
+    }
+
+
+val subTitleTextStyle: TextStyle
+    @Composable get() = when (LocalWindowSizeClass.current.widthSizeClass) {
+        WindowWidthSizeClass.Expanded -> MaterialTheme.typography.headlineMedium
+        WindowWidthSizeClass.Medium -> MaterialTheme.typography.titleMedium
+        else -> // WindowWidthSizeClass.Compact
+            MaterialTheme.typography.bodyMedium
+    }
+
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3WindowSizeClassApi::class)
+@Composable
+internal fun App() = AppTheme {
+    Napier.base(DebugAntilog())
+    val viewModel by lazy {
+        AppModule.homeViewModel
+    }
+    PreComposeApp {
+        HomeScreen(viewModel)
+    }
+}
+
+fun ehPath(size: Size): Path {
+    val rect = Rect(Offset.Zero, size)
+    val borderPath = Path().apply {
+        moveTo(rect.topLeft.x, rect.topLeft.y)
+        // start
+        lineTo(rect.topLeft.x, rect.bottomLeft.y)
+        // bottom
+        lineTo(rect.bottomRight.x, rect.bottomRight.y)
+        // end
+        lineTo(rect.bottomRight.x, rect.topRight.y)
+        //close()
+    }
+    return borderPath
+}
+
+
+
+
+@Composable
+private fun DropDownSample() {
+    var expanded by remember { mutableStateOf(false) }
+    var touchPoint: Offset by remember { mutableStateOf(Offset.Zero) }
+    val density = LocalDensity.current
+
+    BoxWithConstraints(
+        Modifier
+            .fillMaxSize()
+            .background(Color.Cyan)
+            .pointerInput(Unit) {
+                detectTapGestures {
+                    Napier.d("TAG onCreate: ${it}")
+                    touchPoint = it
+                    expanded = true
+
+                }
+
+            }
+    ) {
+        val (xDp, yDp) = with(density) {
+            (touchPoint.x.toDp()) to (touchPoint.y.toDp())
+        }
+
+        DropdownMenu(
+            expanded = expanded,
+            offset = DpOffset(xDp, -maxHeight + yDp),
+            onDismissRequest = {
+                expanded = false
+            }
+        ) {
+
+            DropdownMenuItem(
+                onClick = {
+                    expanded = false
+                },
+                interactionSource = MutableInteractionSource(),
+                text = {
+                    Text("Copy")
+                }
+            )
+
+            DropdownMenuItem(
+                onClick = {
+                    expanded = false
+                },
+                interactionSource = MutableInteractionSource(),
+                text = {
+                    Text("Get Balance")
+                }
+            )
+        }
+    }
+}
+
+@Composable
+internal fun App11() = AppTheme {
+    Napier.base(DebugAntilog())
+    //DropDownSample()
+    val list = listOf(
+        "Streaming", "On TV", "For Recent", "In Theaters"
+    )
+    var text by remember { mutableStateOf(list.first()) }
+
+
+    return@AppTheme
+
+    var expanded by remember { mutableStateOf(false) }
+
+    var selected by remember { mutableStateOf("Popular") }
+
+    val corner = 15.dp
+    val corner2 = 0.dp
+
+    var topCornerShape by remember { mutableStateOf(25.dp) }
+
+    val cornerPx = corner.dpToPx()
+
+    val mainShape = RoundedCornerShape(
+        topStart = corner,
+        topEnd = corner,
+        bottomStart = if (!expanded) corner else 0.dp,
+        bottomEnd = if (!expanded) corner else 0.dp
+    )
+
+    val items = listOf(
+        "Streaming", "On TV", "For Recent", "In Theaters"
+    )
+
+    val ehShapeInv =
+        RoundedCornerShape(
+            topStart = 0.dp,
+            topEnd = 0.dp,
+            bottomStart = corner,
+            bottomEnd = corner
+        )
+
+
+    var offset = Offset.Zero
+    var dropDownExpanded by remember { mutableStateOf(false) }
+
+
+    return@AppTheme
+
+
+    Column(Modifier.fillMaxSize().background(Color.LightGray).padding(12.dp)) {
+
+        HeaderTitleItem(text = "HeaderItem") {
+            offset = Offset(it.x.toFloat(), it.y.toFloat())
+            dropDownExpanded = !dropDownExpanded
+        }
+    }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        MaterialTheme(
+            colorScheme = MaterialTheme.colorScheme.copy(surface = Color(0xFFe3f2fd)),
+            shapes = MaterialTheme.shapes.copy(
+                extraSmall = ehShapeInv,
+                small = ehShapeInv,
+                medium = ehShapeInv,
+                large = ehShapeInv,
+                extraLarge = ehShapeInv
+            )
+        ) {
+
+        }
+        DropdownMenu(
+            expanded = dropDownExpanded,
+            //offset = DpOffset(offset.x.dp, offset.y.dp),
+            modifier = Modifier.background(
+                brush = Brush.horizontalGradient(
+                    colors =
+                    listOf(
+                        Color(0xFFBEFDCE),
+                        Color(0xFF20D5A9)
+                    )
+                ), ehShapeInv
+            ).drawBehind {
+
+                //scale(scale = 0.9f) {
+                rotate(0f) {
+                    drawPath(
+                        path = ehPath1(size = size),
+                        color = Color(0xFF1ED5A9),
+                        style = Stroke(
+                            width = 2.dp.toPx(),
+                            pathEffect = PathEffect.cornerPathEffect(
+                                cornerPx + cornerPx / 3
+                            )
+                        )
+                    )
+                }
+            },
+            onDismissRequest = { dropDownExpanded = false }) {
+            Text("Holla")
+            return@DropdownMenu
+
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(start = 15.dp, end = 15.dp, bottom = 8.dp)
+            ) {
+                items.forEach { item ->
+                    Text(
+                        text = item,
+                        fontWeight = FontWeight.SemiBold,
+                        color = Color(0xFF032541),
+                        modifier = Modifier.fillMaxWidth().clickable {
+                            selected = item
+                            expanded = false
+                        }.padding(horizontal = 16.dp, vertical = 8.dp)
+                    )
+                }
+            }
+
+
+        }
+    }
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3WindowSizeClassApi::class)
+@Composable
+internal fun App123() = AppTheme {
+    Napier.base(DebugAntilog())
+
+    val corner = 25.dp
+    var expanded by remember { mutableStateOf(true) }
+
+    val moviesList = listOf(
+        "Streaming",
+        "Popular",
+        "On TV",
+        "For Recent",
+        "In Theaters",
+    )
+    var selectedMovie by remember { mutableStateOf(moviesList[0]) }
+
+
+    val shape = RoundedCornerShape(
+        topStart = corner,
+        topEnd = corner,
+        bottomStart = corner,
+        bottomEnd = corner
+    )
+
+
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
+
+        MaterialTheme(
+            colorScheme = MaterialTheme.colorScheme.copy(surface = Color(0xFFe3f2fd)),
+            shapes = MaterialTheme.shapes.copy(
+                extraSmall = shape,
+                small = shape,
+                medium = shape,
+                large = shape,
+                extraLarge = shape
+            )
+        ) {
+            ExposedDropdownMenuBox(
+                expanded = expanded,
+                onExpandedChange = {
+                    expanded = !expanded
+                },
+                modifier = Modifier.width(150.dp)
+            ) {
+                /*
+
+                TextField(
+                    textStyle = TextStyle(color = Color.Magenta, fontSize = 14.sp),
+                    modifier = Modifier
+                        .menuAnchor().background(
+                            brush = Brush.horizontalGradient(
+                                colors =
+                                listOf(
+                                    Color(0xFFBEFDCE),
+                                    Color(0xFF20D5A9)
+                                )
+                            ),
+                            shape = shapeMenu
+                        ),
+                    readOnly = true,
+                    value = selectedMovie,
+                    onValueChange = {},
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                    colors = ExposedDropdownMenuDefaults.textFieldColors(
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent,
+                        disabledIndicatorColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent,
+                        focusedContainerColor = Color.Transparent,
+                        disabledContainerColor = Color.Transparent,
+                        errorContainerColor = Color.Transparent
+                    ),
+                )
+                */
+                Row(
+                    modifier = Modifier
+                        .menuAnchor()
+                        .background(
+                            brush = Brush.linearGradient(
+                                colors =
+                                listOf(
+                                    Color(0xFFBEFDCE),
+                                    Color(0xFF20D5A9)
+                                )
+                            ), shape = shape
+                        )
+                        .border(
+                            width = 0.5.dp,
+                            color = Color(0xFF1ED5A9),
+                            shape = shape
+                        )
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Text(text = selectedMovie, Modifier.width(100.dp))
+                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                }
+
+
+                // menu
+                ExposedDropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = {
+                        expanded = false
+                    },
+                    modifier = Modifier.background(
+                        brush = Brush.horizontalGradient(
+                            colors =
+                            listOf(
+                                Color(0xFFBEFDCE),
+                                Color(0xFF20D5A9)
+                            )
+                        )
+                    ),
+                ) {
+                    // menu items
+                    moviesList.forEach { selectionOption ->
+                        DropdownMenuItem(
+                            modifier = Modifier.height(30.dp),
+                            text = {
+                                Box(contentAlignment = Alignment.Center) {
+                                    Text(selectionOption, fontSize = 10.sp)
+                                }
+                            },
+                            onClick = {
+                                selectedMovie = selectionOption
+                                expanded = false
+                            },
+                            contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
+                        )
+                    }
+                }
+            }
+
+        }
+    }
+
+
+}
+
+@Composable
+internal fun App2() = AppTheme {
+    Napier.base(DebugAntilog())
+
+    val json = """{
+      "adult": false,
+      "backdrop_path": "/8GnWDLn2AhnmkQ7hlQ9NJUYobSS.jpg",
+      "id": 695721,
+      "title": "Los juegos del hambre: Balada de pájaros cantores y serpientes",
+      "original_language": "en",
+      "original_title": "The Hunger Games: The Ballad of Songbirds & Snakes",
+      "overview": "Ambientada en un Panem postapocalíptico, nos hace retroceder varias décadas antes del comienzo de las aventuras de Katniss Everdeen. El joven Coriolanus Snow será el mentor de Lucy Gray Baird, la niña seleccionada como tributo del empobrecido Distrito 12. La joven sorprenderá a todos al cantar en la ceremonia de inauguración de los Décimos Juegos del Hambre en los que Snow intentará aprovecharse de su talento y encanto para sobrevivir.",
+      "poster_path": "/z9oNYBLNa6f4MyLIkihlDSi1hxe.jpg",
+      "media_type": "movie",
+      "genre_ids": [
+        18,
+        878,
+        28
+      ],
+      "popularity": 810.099,
+      "release_date": "2023-11-15",
+      "video": false,
+      "vote_average": 7.282,
+      "vote_count": 835,
+      "name" :  "",
+      "original_name" : "",
+      "first_air_date" : "",
+      "origin_country" : [
+        "ES"
+      ]
+    }"""
+
+    val data = json.toModel<Result>()
+    Box(
+        modifier = Modifier.fillMaxSize().background(Color.White),
+        contentAlignment = Alignment.Center
+    ) {
+
+        LazyColumn() {
+            item {
+                CardHorizontalPoster(data = data, onMouseover = {
+                    Napier.i { "onMouseover ${data.title} = $it" }
+                }) {
+
+                }
+            }
+        }
+
+    }
+
+}
+
+
+internal expect fun openUrl(url: String?)
+
+
