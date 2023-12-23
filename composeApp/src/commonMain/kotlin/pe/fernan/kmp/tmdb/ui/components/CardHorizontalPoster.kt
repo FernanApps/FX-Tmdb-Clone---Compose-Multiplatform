@@ -21,13 +21,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.PointerType
-import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.seiko.imageloader.rememberImagePainter
 import pe.fernan.kmp.tmdb.domain.model.Result
+import pe.fernan.kmp.tmdb.ui.common.onPointerEventCommon
 import pe.fernan.kmp.tmdb.utils.Constant
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalComposeUiApi::class)
@@ -57,7 +57,7 @@ fun CardHorizontalPoster(
                     cardWidth = coordinates.size.width
                 }*/.clickable {
                         onClick(data)
-                    }.onPointerEvent(PointerEventType.Move) { focusState ->
+                    }.onPointerEventCommon(PointerEventType.Move) { focusState ->
 
                         /*
 

@@ -1,8 +1,6 @@
 
-import androidx.compose.foundation.HorizontalScrollbar
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.defaultScrollbarStyle
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,7 +14,6 @@ import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -44,6 +41,9 @@ import org.jetbrains.compose.resources.painterResource
 import pe.fernan.kmp.tmdb.paddingInternal
 import pe.fernan.kmp.tmdb.subTitleTextStyle
 import pe.fernan.kmp.tmdb.theme.LocalWindowSizeClass
+import pe.fernan.kmp.tmdb.ui.common.HorizontalScrollbarCommon
+import pe.fernan.kmp.tmdb.ui.common.defaultScrollbarStyleCommon
+import pe.fernan.kmp.tmdb.ui.common.rememberScrollbarAdapterCommon
 import pe.fernan.kmp.tmdb.ui.components.AnimatedTab
 import pe.fernan.kmp.tmdb.ui.components.DropDownMenuCustom
 import pe.fernan.kmp.tmdb.ui.ext.mouseClickHorizontalScroll
@@ -239,20 +239,11 @@ fun <T> HomeSection(
                     }
                 }
 
-                HorizontalScrollbar(
+                HorizontalScrollbarCommon(
                     modifier = Modifier.fillMaxWidth()
                         .padding(start = paddingInternal, top = 12.dp, end = 12.dp),
-                    adapter = rememberScrollbarAdapter(stateList),
-                    style = defaultScrollbarStyle().let {
-                        if (background != null) {
-                            it.copy(
-                                unhoverColor = Color.Gray.copy(alpha = 0.35f),
-                                hoverColor = Color.Gray.copy(alpha = 0.60f)
-                            )
-                        } else {
-                            it
-                        }
-                    }
+                    adapter = rememberScrollbarAdapterCommon(stateList),
+                    style = defaultScrollbarStyleCommon(background)
                 )
             }
 

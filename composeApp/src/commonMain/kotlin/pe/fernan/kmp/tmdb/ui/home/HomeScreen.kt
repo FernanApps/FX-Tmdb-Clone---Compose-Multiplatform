@@ -3,7 +3,6 @@ package pe.fernan.kmp.tmdb.ui.home
 
 import HomeSection
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -29,7 +28,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -108,6 +106,8 @@ import pe.fernan.kmp.tmdb.theme.LocalThemeIsDark
 import pe.fernan.kmp.tmdb.theme.LocalWindowSizeClass
 import pe.fernan.kmp.tmdb.titleTextStyle
 import pe.fernan.kmp.tmdb.ui.common.LocalCurrentSize
+import pe.fernan.kmp.tmdb.ui.common.VerticalScrollbarCommon
+import pe.fernan.kmp.tmdb.ui.common.rememberScrollbarAdapterCommon
 import pe.fernan.kmp.tmdb.ui.components.CardHorizontalPoster
 import pe.fernan.kmp.tmdb.ui.components.CardPoster
 import pe.fernan.kmp.tmdb.ui.components.CustomTextField
@@ -487,9 +487,9 @@ fun HomeScreen(viewModel: HomeViewModel) {
 
                     }
 
-                    VerticalScrollbar(
+                    VerticalScrollbarCommon(
                         modifier = Modifier.align(Alignment.CenterEnd).fillMaxHeight(),
-                        adapter = rememberScrollbarAdapter(
+                        adapter = rememberScrollbarAdapterCommon(
                             scrollState = state
                         )
                     )
