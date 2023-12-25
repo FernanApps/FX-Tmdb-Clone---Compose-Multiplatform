@@ -14,13 +14,11 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
+import pe.fernan.kmp.tmdb.data.model.ResponseList
 import pe.fernan.kmp.tmdb.data.model.ResponseMovieList
 import pe.fernan.kmp.tmdb.data.model.ResponseTVSeriesList
 import pe.fernan.kmp.tmdb.data.model.ResponseTrending
 import pe.fernan.kmp.tmdb.domain.model.MediaType
-import pe.fernan.kmp.tmdb.domain.model.MovieListType
-import pe.fernan.kmp.tmdb.domain.model.TVSeriesListType
-import pe.fernan.kmp.tmdb.domain.model.TimeWindows
 import pe.fernan.kmp.tmdb.utils.Constant.BASE_URL
 import pe.fernan.kmp.tmdb.utils.Constant.DEFAULT_PATH
 import pe.fernan.kmp.tmdb.utils.Constant.TIMEOUT
@@ -50,8 +48,8 @@ object TmdbClientApi {
     }
 
 
-    suspend fun getTrendingAll(timeWindows: TimeWindows): ResponseTrending {
-        val url = BASE_URL + "/trending/all/" + timeWindows.value + "?" +DEFAULT_PATH
+    suspend fun getTrendingAll(timeWindows: String): ResponseTrending {
+        val url = BASE_URL + "/trending/all/" + timeWindows + "?" +DEFAULT_PATH
         return client.get(url).body()
     }
 
@@ -75,23 +73,26 @@ object TmdbClientApi {
 
      */
 
-    suspend fun getDiscoverAll(mediaType: MediaType): ResponseTrending {
+    suspend fun getDiscoverAll(mediaType: String): ResponseTrending {
         val url =
-            BASE_URL + "/discover/" + mediaType.value +"?page=1" + /*sortByOptions.first() + */"&" + DEFAULT_PATH
+            BASE_URL + "/discover/" + mediaType +"?page=1" + /*sortByOptions.first() + */"&" + DEFAULT_PATH
         return client.get(url).body()
     }
 
-    suspend fun getMovieList(movieListType: MovieListType): ResponseMovieList {
-        val url = BASE_URL + "/movie/" + movieListType.value + "?" + DEFAULT_PATH
+    suspend fun getMovieList(movieListType: String): ResponseMovieList {
+        val url = BASE_URL + "/movie/" + movieListType + "?" + DEFAULT_PATH
         return client.get(url).body()
     }
 
-    suspend fun getTVSeriesList(tvSeriesListType: TVSeriesListType): ResponseTVSeriesList {
-        val url = BASE_URL + "/tv/" + tvSeriesListType.value + "?" + DEFAULT_PATH
+    suspend fun getTVSeriesList(tvSeriesListType: String): ResponseTVSeriesList {
+        val url = BASE_URL + "/tv/" + tvSeriesListType + "?" + DEFAULT_PATH
         return client.get(url).body()
     }
 
-
+    suspend fun getList(keyType: String, key: String): ResponseList {
+        val url = BASE_URL + "/$keyType/" + key + "?" + DEFAULT_PATH
+        return client.get(url).body()
+    }
 
 
 }
@@ -100,7 +101,7 @@ object TmdbClientApi {
 suspend fun main() = coroutineScope {
     launch {
         //println(TmdbClientApi.getTrendingAll(TimeWindows.DAY).toJson())
-        println(TmdbClientApi.getDiscoverAll(MediaType.MOVIE).toJson())
+        println(TmdbClientApi.getDiscoverAll(MediaType.MOVIE.value).toJson())
     }
     println("Hello")
 }

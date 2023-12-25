@@ -84,7 +84,7 @@ fun CardHorizontalPoster(
 
                          */
                         if (focusState.changes.firstOrNull()?.type == PointerType.Mouse) {
-                            onMouseover(data.posterPath)
+                            onMouseover(data.backdropPath)
                         }
 
                     }

@@ -6,10 +6,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
-import pe.fernan.kmp.tmdb.domain.model.MediaType
-import pe.fernan.kmp.tmdb.domain.model.MovieListType
 import pe.fernan.kmp.tmdb.domain.model.Result
-import pe.fernan.kmp.tmdb.domain.model.TVSeriesListType
 import pe.fernan.kmp.tmdb.domain.model.TimeWindows
 import pe.fernan.kmp.tmdb.domain.repository.TmdbRepository
 
@@ -23,19 +20,42 @@ data class HomeState(
     val tvSeriesList: List<Result>? = null,
 )
 
+data class ItemsState(
+    val itemsList: List<Result>? = null,
+)
+
 
 class HomeViewModel(
     private val repository: TmdbRepository
 ) : ViewModel() {
+
     private val _homeState =
-        MutableStateFlow<HomeState>(HomeState())
+        MutableStateFlow(HomeState())
     val homeState = _homeState.asStateFlow()
 
-    fun getTrendingList(key: TimeWindows = TimeWindows.DAY) {
+    private val _itemsState =
+        MutableStateFlow(ItemsState())
+    val itemsState = _itemsState.asStateFlow()
+
+    fun getList(keyType: String, key: String){
+        viewModelScope.launch {
+            _itemsState.update { it.copy(itemsList = null) }
+            try {
+                val list = repository.getList(keyType, key)
+                _itemsState.update { it.copy(itemsList = list) }
+            } catch (e: Exception) {
+                val error = e.message.toString()
+            }
+
+        }
+    }
+
+
+    fun getTrendingList(key: String = TimeWindows.DAY.value) {
         viewModelScope.launch {
             _homeState.update { it.copy(trendingList = null) }
             try {
-                val list = repository.getTrendingList(key)!!
+                val list = repository.getTrendingList(key)
                 _homeState.update { it.copy(trendingList = list) }
             } catch (e: Exception) {
                 val error = e.message.toString()
@@ -44,7 +64,7 @@ class HomeViewModel(
         }
     }
 
-    fun getDiscover(key: MediaType) {
+    fun getDiscover(key: String) {
         viewModelScope.launch {
             _homeState.update { it.copy(discoverList = null) }
             try {
@@ -71,7 +91,7 @@ class HomeViewModel(
         }
     }
 
-    fun getMovieList(key: MovieListType) {
+    fun getMovieList(key: String) {
         viewModelScope.launch {
             _homeState.update { it.copy(movieList = null) }
             try {
@@ -85,7 +105,7 @@ class HomeViewModel(
         }
     }
 
-    fun getTVSeriesList(key: TVSeriesListType) {
+    fun getTVSeriesList(key: String) {
         viewModelScope.launch {
             _homeState.update { it.copy(tvSeriesList = null) }
             try {

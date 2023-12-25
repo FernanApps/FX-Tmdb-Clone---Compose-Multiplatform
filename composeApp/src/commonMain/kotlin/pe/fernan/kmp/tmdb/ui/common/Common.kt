@@ -2,6 +2,7 @@ package pe.fernan.kmp.tmdb.ui.common
 
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -58,9 +59,11 @@ internal expect fun VerticalScrollbarCommon(
     adapter: Any,
     modifier: Modifier = Modifier,
     reverseLayout: Boolean = false,
-    style: Any = Any(),
+    style: Any? = null,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
 )
+
+
 
 
 
@@ -68,6 +71,11 @@ internal expect fun VerticalScrollbarCommon(
 @Composable
 internal expect fun rememberScrollbarAdapterCommon(
     scrollState: LazyListState,
+): Any
+
+@Composable
+internal expect fun rememberScrollbarAdapterCommon(
+    scrollState: LazyGridState,
 ): Any
 
 

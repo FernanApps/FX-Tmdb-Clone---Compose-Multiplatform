@@ -60,6 +60,17 @@ kotlin {
             implementation(libs.ktor.client.content.negotiation)
             implementation(libs.io.ktor.ktor.client.serialization)
 
+            // Core library
+            implementation(libs.kmpalette.core)
+
+            // Optional extensions based on your image source
+            implementation(libs.kmpalette.extensions.base64)
+            implementation(libs.kmpalette.extensions.bytearray)
+            implementation(libs.kmpalette.extensions.libres)
+            implementation(libs.kmpalette.extensions.network)
+            implementation(libs.kmpalette.extensions.resources)
+            //implementation(libs.kmpalette.extensions.file)
+            implementation(libs.materialKolor)
 
 
         }

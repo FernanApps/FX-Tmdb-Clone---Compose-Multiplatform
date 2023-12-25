@@ -1,4 +1,5 @@
 package pe.fernan.kmp.tmdb.utils
+
 import kotlinx.datetime.Clock
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
@@ -10,7 +11,19 @@ import kotlinx.datetime.plus
 import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
 
+/**
+ * @param dateString -> format is "2023-12-15"
+ * @return year, month, day
+ */
+fun getDate(dateString: String): Triple<Int, Int, Int>? {
+    val regexDate = Regex("""(\d{4})-(\d{2})-(\d{2})""")
+    val (year, month, day) = regexDate.find(dateString)?.destructured ?: return null
+    return Triple(year.toInt(), month.toInt(), day.toInt())
+}
+
 object TimeExt {
+
+
     fun LocalDateTime.Companion.now(): LocalDateTime {
         return Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
     }
@@ -30,6 +43,7 @@ object TimeExt {
     fun LocalTime.Companion.max(): LocalTime {
         return LocalTime(23, 59, 59, 999999999)
     }
+
     fun LocalDate.atStartOfDay(): LocalDateTime {
         return LocalDateTime(this, LocalTime.min())
     }
@@ -63,5 +77,5 @@ object TimeExt {
     val dateTimeAfterOneDay: LocalDateTime = datetime.plus(24, DateTimeUnit.HOUR)
     val dateTime30MinEarlier: LocalDateTime = datetime.minus(30, DateTimeUnit.MINUTE)
      */
-    
+
 }

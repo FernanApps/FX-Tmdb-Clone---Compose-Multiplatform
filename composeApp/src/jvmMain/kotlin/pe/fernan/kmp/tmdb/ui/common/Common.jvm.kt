@@ -2,14 +2,14 @@ package pe.fernan.kmp.tmdb.ui.common
 
 import androidx.compose.foundation.HorizontalScrollbar
 import androidx.compose.foundation.LocalScrollbarStyle
-import androidx.compose.foundation.ScrollbarAdapter
 import androidx.compose.foundation.ScrollbarStyle
 import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.defaultScrollbarStyle
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.grid.LazyGridState
+import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -30,54 +30,39 @@ internal actual fun LocalCurrentSize() = CurrentWindowsSize(
 
 internal actual val CurrentPlatformTarget = PlatformTarget.Jvm
 
-@OptIn(ExperimentalComposeUiApi::class)
-private fun Modifier.onPointerEventBase(
-    eventType: PointerEventType,
-    pass: PointerEventPass = PointerEventPass.Main,
-    onEvent: AwaitPointerEventScope.(event: PointerEvent) -> Unit
-) = this.onPointerEvent(eventType, pass, onEvent)
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 internal actual fun Modifier.onPointerEventCommon(
     eventType: PointerEventType,
     pass: PointerEventPass,
     onEvent: AwaitPointerEventScope.(event: PointerEvent) -> Unit
-): Modifier = onPointerEventBase(eventType, pass, onEvent)
+): Modifier = this.onPointerEvent(eventType, pass, onEvent)
 
 
-@OptIn(ExperimentalComposeUiApi::class)
-@Composable
-private fun VerticalScrollbarBase(
-    adapter: Any,
-    modifier: Modifier = Modifier,
-    reverseLayout: Boolean = false,
-    style: Any = LocalScrollbarStyle.current,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
-) = VerticalScrollbar(
-    adapter as androidx.compose.foundation.v2.ScrollbarAdapter,
-    modifier, reverseLayout,
-    style as ScrollbarStyle,
-    interactionSource
-)
 @Composable
 internal actual fun VerticalScrollbarCommon(
     adapter: Any,
     modifier: Modifier,
     reverseLayout: Boolean,
-    style: Any,
+    style: Any?,
     interactionSource: MutableInteractionSource
-) = VerticalScrollbarBase(adapter, modifier, reverseLayout, style, interactionSource)
+) = VerticalScrollbar(
+    adapter as androidx.compose.foundation.v2.ScrollbarAdapter,
+    modifier, reverseLayout,
+    if(style == null) LocalScrollbarStyle.current else style as ScrollbarStyle,
+    interactionSource
+)
 
 
-@Composable
-private fun rememberScrollbarAdapterBase(
-    scrollState: LazyListState,
-): androidx.compose.foundation.v2.ScrollbarAdapter = remember(scrollState) {
-    ScrollbarAdapter(scrollState)
-}
 @Composable
 internal actual fun rememberScrollbarAdapterCommon(scrollState: LazyListState): Any =
-    rememberScrollbarAdapterBase(scrollState)
+    rememberScrollbarAdapter(scrollState)
+
+@Composable
+internal actual fun rememberScrollbarAdapterCommon(scrollState: LazyGridState): Any =
+    rememberScrollbarAdapter(scrollState)
+
 
 private fun defaultScrollbarStyleBase(background: String?): Any = defaultScrollbarStyle().let {
     if (background != null) {
@@ -89,23 +74,11 @@ private fun defaultScrollbarStyleBase(background: String?): Any = defaultScrollb
         it
     }
 }
-internal actual fun defaultScrollbarStyleCommon(background: String?): Any = defaultScrollbarStyleBase(background)
+
+internal actual fun defaultScrollbarStyleCommon(background: String?): Any =
+    defaultScrollbarStyleBase(background)
 
 
-@Composable
-private fun HorizontalScrollbarBase(
-    adapter: Any,
-    modifier: Modifier = Modifier,
-    reverseLayout: Boolean = false,
-    style: Any,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
-) = HorizontalScrollbar(
-    adapter as androidx.compose.foundation.v2.ScrollbarAdapter,
-    modifier,
-    reverseLayout,
-    style as androidx.compose.foundation.ScrollbarStyle,
-    interactionSource
-)
 @Composable
 internal actual fun HorizontalScrollbarCommon(
     adapter: Any,
@@ -113,5 +86,11 @@ internal actual fun HorizontalScrollbarCommon(
     reverseLayout: Boolean,
     style: Any,
     interactionSource: MutableInteractionSource
-) = HorizontalScrollbarBase(adapter, modifier, reverseLayout, style, interactionSource)
+) = HorizontalScrollbar(
+    adapter as androidx.compose.foundation.v2.ScrollbarAdapter,
+    modifier,
+    reverseLayout,
+    style as androidx.compose.foundation.ScrollbarStyle,
+    interactionSource
+)
 

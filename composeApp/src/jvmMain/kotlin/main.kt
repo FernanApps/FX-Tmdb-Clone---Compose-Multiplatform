@@ -64,8 +64,17 @@ import pe.fernan.kmp.tmdb.ui.components.CardHorizontalPoster
 import pe.fernan.kmp.tmdb.ui.components.CircularProgressbar1
 import pe.fernan.kmp.tmdb.ui.components.MultiSelector
 import pe.fernan.kmp.tmdb.ui.components.TextSwitch
+import pe.fernan.kmp.tmdb.ui.items.ItemsScreen
 import pe.fernan.kmp.tmdb.utils.toModel
 import java.awt.Dimension
+
+@Preview
+@Composable
+fun PreviewItemScreen() {
+    AppTheme {
+
+    }
+}
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -76,6 +85,9 @@ fun main() = application {
         onCloseRequest = ::exitApplication,
     ) {
         App()
+        //Napier.base(DebugAntilog())
+        //PreviewItemScreen()
+        "ASASAs".format("asas")
     }
 }
 

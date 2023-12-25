@@ -1,4 +1,3 @@
-
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -87,8 +86,8 @@ fun <T> HomeSection(
     onTabItemSelected: (Int) -> Unit,
     itemList: List<T>,
     itemContent: @Composable LazyItemScope.(data: T) -> Unit,
+) {
 
-    ) {
     if (itemList.isEmpty()) {
         return
     }
@@ -176,7 +175,7 @@ fun <T> HomeSection(
                 if (LocalWindowSizeClass.current.widthSizeClass == WindowWidthSizeClass.Compact) {
 
                     DropDownMenuCustom(
-                        width = 150.dp,
+                        width = 175.dp,
                         selectedItemIndex = tabSelectedItemIndex,
                         items = tabItems,
                         onItemSelected = {

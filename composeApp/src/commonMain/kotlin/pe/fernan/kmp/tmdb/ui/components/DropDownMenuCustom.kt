@@ -60,7 +60,10 @@ fun DropDownMenuCustom(
     itemBackgroundBrush: Brush,
     backgroundBorderColor: Color,
     textStyle: TextStyle = TextStyle(),
-    iconColor: Color = Color.Black
+    iconColor: Color = Color.Black,
+    fixDropMenuPosition: (Int) -> Int = {
+        it / 2
+    }
 ) {
     var isDropDownMenuExpanded by remember { mutableStateOf(false) }
     var offset by remember { mutableStateOf(IntOffset.Zero) }
@@ -127,7 +130,7 @@ fun DropDownMenuCustom(
                     columnHeightPx = coordinates.size.height
                     offset = IntOffset(
                         positionInParent.x.toInt(),
-                        positionInParent.y.toInt() + (columnHeightPx / 2)
+                        positionInParent.y.toInt() + fixDropMenuPosition(columnHeightPx)
                     )
                 },
             verticalAlignment = Alignment.CenterVertically,

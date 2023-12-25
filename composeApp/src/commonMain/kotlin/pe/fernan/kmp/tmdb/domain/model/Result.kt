@@ -3,6 +3,7 @@ package pe.fernan.kmp.tmdb.domain.model
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+
 @Serializable
 class Result(
     @SerialName("adult")
@@ -44,12 +45,12 @@ class Result(
     @SerialName("origin_country")
     val originCountry: List<String?>?,
 
-
-
-
-
-
 ){
     constructor(): this(false,"",-1,"","","","","","", listOf<Int>(),0.0,"",false,0.0,0,"","","",
         listOf<String>())
+
+    // 2023-12-15
+    val date get() = if(mediaType == "movie") releaseDate else firstAirDate
+
 }
+

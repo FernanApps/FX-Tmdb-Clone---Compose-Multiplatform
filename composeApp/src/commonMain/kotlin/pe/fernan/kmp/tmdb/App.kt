@@ -10,20 +10,36 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.LightMode
+import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
@@ -47,22 +63,26 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
-import moe.tlaster.precompose.PreComposeApp
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import pe.fernan.kmp.tmdb.di.AppModule
 import pe.fernan.kmp.tmdb.domain.model.Result
 import pe.fernan.kmp.tmdb.theme.AppTheme
+import pe.fernan.kmp.tmdb.theme.LocalThemeIsDark
 import pe.fernan.kmp.tmdb.theme.LocalWindowSizeClass
 import pe.fernan.kmp.tmdb.ui.components.CardHorizontalPoster
 import pe.fernan.kmp.tmdb.ui.ext.dpToPx
-import pe.fernan.kmp.tmdb.ui.home.HeaderTitleItem
-import pe.fernan.kmp.tmdb.ui.home.HomeScreen
+import pe.fernan.kmp.tmdb.ui.main.HeaderTitleItem
+import pe.fernan.kmp.tmdb.ui.main.MainScreen
+import pe.fernan.kmp.tmdb.ui.splash.SplashScreen
 import pe.fernan.kmp.tmdb.utils.toModel
 
 
@@ -87,6 +107,13 @@ val titleTextStyle: TextStyle
             MaterialTheme.typography.headlineSmall
     }
 
+val titleTextStyle2: TextStyle
+    @Composable get() = when (LocalWindowSizeClass.current.widthSizeClass) {
+        WindowWidthSizeClass.Expanded -> MaterialTheme.typography.displaySmall
+        WindowWidthSizeClass.Medium -> MaterialTheme.typography.headlineMedium
+        else -> // WindowWidthSizeClass.Compact
+            MaterialTheme.typography.headlineSmall
+    }
 
 val subTitleTextStyle: TextStyle
     @Composable get() = when (LocalWindowSizeClass.current.widthSizeClass) {
@@ -101,12 +128,21 @@ val subTitleTextStyle: TextStyle
 @Composable
 internal fun App() = AppTheme {
     Napier.base(DebugAntilog())
+
     val viewModel by lazy {
         AppModule.homeViewModel
     }
-    PreComposeApp {
-        HomeScreen(viewModel)
+    var splash by remember { mutableStateOf(true) }
+    if (splash) {
+        SplashScreen {
+            if (splash) {
+                splash = false
+            }
+        }
+    } else {
+        MainScreen(viewModel)
     }
+
 }
 
 fun ehPath(size: Size): Path {
@@ -123,8 +159,6 @@ fun ehPath(size: Size): Path {
     }
     return borderPath
 }
-
-
 
 
 @Composable
@@ -502,6 +536,78 @@ internal fun App2() = AppTheme {
 
 }
 
+@Composable
+internal fun App1() = AppTheme {
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var passwordVisibility by remember { mutableStateOf(false) }
+
+    Column(modifier = Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.safeDrawing)) {
+
+        Row(
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = "Login",
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.padding(16.dp)
+            )
+
+            Spacer(modifier = Modifier.weight(1.0f))
+
+            var isDark by LocalThemeIsDark.current
+            IconButton(onClick = { isDark = !isDark }) {
+                Icon(
+                    modifier = Modifier.padding(8.dp).size(20.dp),
+                    imageVector = if (isDark) Icons.Default.LightMode else Icons.Default.DarkMode,
+                    contentDescription = null
+                )
+            }
+        }
+
+        OutlinedTextField(
+            value = email,
+            onValueChange = { email = it },
+            label = { Text("Email") },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth().padding(16.dp)
+        )
+
+        OutlinedTextField(value = password,
+            onValueChange = { password = it },
+            label = { Text("Password") },
+            singleLine = true,
+            visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
+            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Password
+            ),
+            trailingIcon = {
+                IconButton(onClick = { passwordVisibility = !passwordVisibility }) {
+                    val imageVector =
+                        if (passwordVisibility) Icons.Default.Close else Icons.Default.Edit
+                    Icon(
+                        imageVector,
+                        contentDescription = if (passwordVisibility) "Hide password" else "Show password"
+                    )
+                }
+            })
+
+        Button(
+            onClick = { /* Handle login logic here */ },
+            modifier = Modifier.fillMaxWidth().padding(16.dp)
+        ) {
+            Text("Login")
+        }
+
+        TextButton(
+            onClick = { openUrl("https://github.com/terrakok") },
+            modifier = Modifier.fillMaxWidth().padding(16.dp)
+        ) {
+            Text("Open github")
+        }
+    }
+}
 
 internal expect fun openUrl(url: String?)
 
