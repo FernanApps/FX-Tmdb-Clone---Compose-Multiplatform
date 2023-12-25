@@ -46,7 +46,7 @@ class Result(
     val originCountry: List<String?>?,
 
 ){
-    constructor(): this(false,"",-1,"","","","","","", listOf<Int>(),0.0,"",false,0.0,0,"","","",
+    constructor(id: Int): this(false,"",id,"","","","","","", listOf<Int>(),0.0,"",false,0.0,0,"","","",
         listOf<String>())
 
     // 2023-12-15

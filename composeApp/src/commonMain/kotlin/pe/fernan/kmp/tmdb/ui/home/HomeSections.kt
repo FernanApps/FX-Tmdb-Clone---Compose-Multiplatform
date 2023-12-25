@@ -36,7 +36,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.seiko.imageloader.rememberImagePainter
 import org.jetbrains.compose.resources.ExperimentalResourceApi
-import org.jetbrains.compose.resources.painterResource
+import pe.fernan.kmp.tmdb.domain.model.Result
+import pe.fernan.kmp.tmdb.loadDrawableResource
 import pe.fernan.kmp.tmdb.paddingInternal
 import pe.fernan.kmp.tmdb.subTitleTextStyle
 import pe.fernan.kmp.tmdb.theme.LocalWindowSizeClass
@@ -47,10 +48,11 @@ import pe.fernan.kmp.tmdb.ui.components.AnimatedTab
 import pe.fernan.kmp.tmdb.ui.components.DropDownMenuCustom
 import pe.fernan.kmp.tmdb.ui.ext.mouseClickHorizontalScroll
 import pe.fernan.kmp.tmdb.ui.ext.pxToDp
+import kotlin.random.Random
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
-fun <T> HomeSection(
+fun HomeSection(
     title: String,
     titleColor: Color = Color.Black,
     background: String? = null,
@@ -72,6 +74,8 @@ fun <T> HomeSection(
             ),
         ),
         fontWeight = FontWeight.SemiBold,
+        fontFamily = MaterialTheme.typography.bodyMedium.fontFamily
+
     ),
     tabItemContentSelectedStyle: TextStyle = TextStyle(
         brush = Brush.linearGradient(
@@ -81,11 +85,12 @@ fun <T> HomeSection(
             )
         ),
         fontWeight = FontWeight.Bold,
+        fontFamily = MaterialTheme.typography.bodyMedium.fontFamily
     ),
     tabSelectedItemIndex: Int,
     onTabItemSelected: (Int) -> Unit,
-    itemList: List<T>,
-    itemContent: @Composable LazyItemScope.(data: T) -> Unit,
+    itemList: List<Result>,
+    itemContent: @Composable LazyItemScope.(data: Result) -> Unit,
 ) {
 
     if (itemList.isEmpty()) {
@@ -120,7 +125,7 @@ fun <T> HomeSection(
             val painter = if (background.startsWith("http")) {
                 rememberImagePainter(background)
             } else {
-                painterResource(background)
+                loadDrawableResource(background)
             }
 
             if (backgroundGradient) {
@@ -233,7 +238,10 @@ fun <T> HomeSection(
                     modifier = Modifier.mouseClickHorizontalScroll(stateList)
                         .padding(start = paddingInternal)
                 ) {
-                    items(itemList) {
+                    items(
+                        items = itemList,
+                        key = { "${it.id ?: Random.nextInt()}-${it.mediaType}" }
+                    ) {
                         itemContent(it)
                     }
                 }

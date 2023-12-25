@@ -55,8 +55,8 @@ import pe.fernan.kmp.tmdb.titleTextStyle
 import pe.fernan.kmp.tmdb.ui.common.LocalCurrentSize
 import pe.fernan.kmp.tmdb.ui.common.VerticalScrollbarCommon
 import pe.fernan.kmp.tmdb.ui.common.rememberScrollbarAdapterCommon
-import pe.fernan.kmp.tmdb.ui.components.CardHorizontalPoster
 import pe.fernan.kmp.tmdb.ui.components.CardPoster
+import pe.fernan.kmp.tmdb.ui.components.CardPosterHorizontal
 import pe.fernan.kmp.tmdb.ui.components.CustomTextField
 import pe.fernan.kmp.tmdb.ui.main.itemMovie
 import pe.fernan.kmp.tmdb.ui.main.itemSeriesTV
@@ -148,15 +148,14 @@ fun HomeScreen(viewModel: HomeViewModel, onClickSearch: (String) -> Unit, onItem
                         )
                     },
                     itemList = homeState.trendingList ?: (0..25).toList()
-                        .map { Result() },
+                        .mapIndexed { index, it -> Result(id = index) },
                     itemContent = { data ->
                         Row {
                             CardPoster(
                                 data = data,
-                                loading = homeState.trendingList == null
-                            ) {
-                                onItemClick(data)
-                            }
+                                loading = homeState.trendingList == null,
+                                onClick = onItemClick
+                            )
                             Spacer(Modifier.size(paddingInternal / 2))
                         }
                     }
@@ -197,25 +196,28 @@ fun HomeScreen(viewModel: HomeViewModel, onClickSearch: (String) -> Unit, onItem
                                 )
                         ),
                         fontWeight = FontWeight.SemiBold,
+                        fontFamily = MaterialTheme.typography.bodyMedium.fontFamily
+
                     ),
                     tabItemContentStyle = TextStyle(
                         brush = Brush.linearGradient(
                             colors = listOf(Color.White, Color.White),
                         ),
                         fontWeight = FontWeight.Bold,
+                        fontFamily = MaterialTheme.typography.bodyMedium.fontFamily
+
                     ),
                     itemList = homeState.discoverList ?: (0..25).toList()
-                        .map { Result() },
+                        .mapIndexed { index, it -> Result(id = index) },
                     itemContent = { data ->
                         Row {
-                            CardHorizontalPoster(
+                            CardPosterHorizontal(
                                 data = data,
                                 loading = homeState.discoverList == null,
                                 onMouseover = {
                                     viewModel.setBackgroundDiscover(it)
-                                }, onClick = {
-
-                                }
+                                },
+                                onClick = onItemClick
                             )
                             Spacer(Modifier.size(paddingInternal / 2))
                         }
@@ -238,15 +240,14 @@ fun HomeScreen(viewModel: HomeViewModel, onClickSearch: (String) -> Unit, onItem
                         )
                     },
                     itemList = homeState.movieList ?: (0..25).toList()
-                        .map { Result() },
+                        .mapIndexed { index, it -> Result(id = index) },
                     itemContent = { data ->
                         Row {
                             CardPoster(
                                 data = data,
-                                loading = homeState.movieList == null
-                            ) {
-
-                            }
+                                loading = homeState.movieList == null,
+                                onClick = onItemClick
+                            )
                             Spacer(Modifier.size(paddingInternal / 2))
                         }
                     }
@@ -270,15 +271,14 @@ fun HomeScreen(viewModel: HomeViewModel, onClickSearch: (String) -> Unit, onItem
                         )
                     },
                     itemList = homeState.tvSeriesList ?: (0..25).toList()
-                        .map { Result() },
+                        .mapIndexed { index, it -> Result(id = index) },
                     itemContent = { data ->
                         Row {
                             CardPoster(
                                 data = data,
-                                loading = homeState.tvSeriesList == null
-                            ) {
-
-                            }
+                                loading = homeState.tvSeriesList == null,
+                                onClick = onItemClick
+                            )
                             Spacer(Modifier.size(paddingInternal / 2))
                         }
                     }

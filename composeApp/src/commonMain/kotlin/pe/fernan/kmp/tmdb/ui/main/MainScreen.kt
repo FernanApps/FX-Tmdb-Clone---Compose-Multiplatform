@@ -73,6 +73,7 @@ import org.jetbrains.compose.resources.ExperimentalResourceApi
 import pe.fernan.kmp.tmdb.domain.model.MediaType
 import pe.fernan.kmp.tmdb.domain.model.MovieListType
 import pe.fernan.kmp.tmdb.domain.model.TVSeriesListType
+import pe.fernan.kmp.tmdb.loadDrawableResource
 import pe.fernan.kmp.tmdb.paddingInternal
 import pe.fernan.kmp.tmdb.theme.LocalWindowSizeClass
 import pe.fernan.kmp.tmdb.ui.details.DetailScreen
@@ -444,7 +445,7 @@ fun Header(
 
         if (LocalWindowSizeClass.current.widthSizeClass == WindowWidthSizeClass.Expanded) {
             Image(
-                painter = org.jetbrains.compose.resources.painterResource("logo.xml"),
+                painter = loadDrawableResource("logo.xml"),
                 contentDescription = null,
                 modifier = Modifier.height(18.dp).clickable {
                     onMenuClick(MenuItem.Home)
@@ -486,7 +487,7 @@ fun Header(
                 offsetAdd = IntOffset(positionInParent.x.toInt(), positionInParent.y.toInt())
             }) {
                 Icon(
-                    org.jetbrains.compose.resources.painterResource("ic_add.xml"),
+                    loadDrawableResource("ic_add.xml"),
                     contentDescription = "add",
                     tint = Color.White
                 )
@@ -517,7 +518,7 @@ fun Header(
                 onMenuClick(MenuItem.Search)
             }, modifier = Modifier.size(24.dp)) {
                 Icon(
-                    org.jetbrains.compose.resources.painterResource("ic_search.xml"),
+                    loadDrawableResource("ic_search.xml"),
                     contentDescription = "search",
                     tint = MaterialTheme.colorScheme.secondary
                 )
@@ -535,7 +536,7 @@ fun Header(
             }
             Spacer(Modifier.weight(1f))
             Image(
-                painter = org.jetbrains.compose.resources.painterResource("logo.xml"),
+                painter = loadDrawableResource("logo.xml"),
                 contentDescription = null,
                 modifier = Modifier.height(15.dp).clickable {
                     onMenuClick(MenuItem.Home)
@@ -557,7 +558,7 @@ fun Header(
                 onMenuClick(MenuItem.Search)
             }, modifier = Modifier.size(24.dp)) {
                 Icon(
-                    org.jetbrains.compose.resources.painterResource("ic_search.xml"),
+                    loadDrawableResource("ic_search.xml"),
                     contentDescription = "search",
                     tint = MaterialTheme.colorScheme.secondary
                 )

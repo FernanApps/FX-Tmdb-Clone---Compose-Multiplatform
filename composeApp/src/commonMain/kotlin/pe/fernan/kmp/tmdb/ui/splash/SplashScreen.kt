@@ -28,14 +28,14 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.ExperimentalResourceApi
-import org.jetbrains.compose.resources.painterResource
+import pe.fernan.kmp.tmdb.loadDrawableResource
 import pe.fernan.kmp.tmdb.subTitleTextStyle
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
 fun SplashScreen(onNavigate: () -> Unit) {
     val scale = remember {
-        androidx.compose.animation.core.Animatable(.85f)
+        androidx.compose.animation.core.Animatable(.75f)
     }
     LaunchedEffect(key1 = true) {
         scale.animateTo(
@@ -61,9 +61,9 @@ fun SplashScreen(onNavigate: () -> Unit) {
     ) {
         Spacer(Modifier.size(100.dp))
         Image(
-            painter = painterResource("logo_short.xml"),
+            painter = loadDrawableResource("logo_short.xml"),
             contentDescription = null,
-            modifier = Modifier.scale(scale.value).height(30.dp),
+            modifier = Modifier.scale(scale.value).height(45.dp),
 
             )
         Spacer(Modifier.size(20.dp))

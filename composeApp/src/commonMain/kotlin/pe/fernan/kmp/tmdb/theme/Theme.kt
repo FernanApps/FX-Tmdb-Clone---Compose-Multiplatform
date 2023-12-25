@@ -23,8 +23,6 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import pe.fernan.kmp.tmdb.ui.common.CurrentPlatformTarget
-import pe.fernan.kmp.tmdb.ui.common.PlatformTarget
 
 private val LightColorScheme = lightColorScheme(
     primary = md_theme_light_primary,
@@ -103,7 +101,7 @@ object AppFont {
     var CustomBaseFont: FontFamily? = null
     val BaseFont
         get() = CustomBaseFont
-            ?: if (CurrentPlatformTarget == PlatformTarget.Web) throw Exception("Please load first font custom for change Web") else FontFamily.SansSerif
+            ?: throw Exception("Please load first fonts resources")
 }
 
 private val AppTypography = Typography(

@@ -57,6 +57,7 @@ import pe.fernan.kmp.tmdb.ui.components.DropDownMenuCustom
 import pe.fernan.kmp.tmdb.ui.components.cardPosterWidth
 import pe.fernan.kmp.tmdb.ui.home.HomeViewModel
 import pe.fernan.kmp.tmdb.ui.navigation.NavigateRoute
+import kotlin.random.Random
 
 
 private val paddingHorizontal = 16.dp
@@ -64,7 +65,11 @@ private val paddingVertical = 8.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ItemsScreen(navigateRoute: NavigateRoute, viewModel: HomeViewModel, onItemSelected: (Result) -> Unit) {
+fun ItemsScreen(
+    navigateRoute: NavigateRoute,
+    viewModel: HomeViewModel,
+    onItemSelected: (Result) -> Unit
+) {
 
     var parentKey by remember { mutableStateOf(navigateRoute.parentKey.key) }
     var routeKey by remember { mutableStateOf(navigateRoute.routeKey.key) }
@@ -182,7 +187,13 @@ fun ItemsScreen(navigateRoute: NavigateRoute, viewModel: HomeViewModel, onItemSe
                     }
                 }
 
-                items(itemState.itemsList ?: (0..25).toList().map { Result() }) { data ->
+                items(
+                    items = itemState.itemsList ?: (0..25).toList()
+                        .mapIndexed { index, it -> Result(id = index) }
+                    ,
+                    key = { "${it.id ?: Random.nextInt()}-${it.mediaType}" }
+                ) { data ->
+                    
                     Column {
                         Row(horizontalArrangement = Arrangement.Center) {
                             Card(

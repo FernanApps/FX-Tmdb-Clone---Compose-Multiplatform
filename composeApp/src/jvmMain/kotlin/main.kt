@@ -60,11 +60,10 @@ import androidx.compose.ui.window.singleWindowApplication
 import pe.fernan.kmp.tmdb.App
 import pe.fernan.kmp.tmdb.domain.model.Result
 import pe.fernan.kmp.tmdb.theme.AppTheme
-import pe.fernan.kmp.tmdb.ui.components.CardHorizontalPoster
+import pe.fernan.kmp.tmdb.ui.components.CardPosterHorizontal
 import pe.fernan.kmp.tmdb.ui.components.CircularProgressbar1
 import pe.fernan.kmp.tmdb.ui.components.MultiSelector
 import pe.fernan.kmp.tmdb.ui.components.TextSwitch
-import pe.fernan.kmp.tmdb.ui.items.ItemsScreen
 import pe.fernan.kmp.tmdb.utils.toModel
 import java.awt.Dimension
 
@@ -171,7 +170,7 @@ fun main111111() = application {
 
                 LazyColumn() {
                     item {
-                        CardHorizontalPoster(data = data, onMouseover = {
+                        CardPosterHorizontal(data = data, onMouseover = {
 
                         }) {
 

@@ -36,6 +36,7 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -43,6 +44,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -62,10 +64,12 @@ import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.platform.Font
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
@@ -73,12 +77,14 @@ import androidx.compose.ui.unit.sp
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
 import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.resources.resource
 import pe.fernan.kmp.tmdb.di.AppModule
 import pe.fernan.kmp.tmdb.domain.model.Result
+import pe.fernan.kmp.tmdb.theme.AppFont
 import pe.fernan.kmp.tmdb.theme.AppTheme
 import pe.fernan.kmp.tmdb.theme.LocalThemeIsDark
 import pe.fernan.kmp.tmdb.theme.LocalWindowSizeClass
-import pe.fernan.kmp.tmdb.ui.components.CardHorizontalPoster
+import pe.fernan.kmp.tmdb.ui.components.CardPosterHorizontal
 import pe.fernan.kmp.tmdb.ui.ext.dpToPx
 import pe.fernan.kmp.tmdb.ui.main.HeaderTitleItem
 import pe.fernan.kmp.tmdb.ui.main.MainScreen
@@ -123,16 +129,14 @@ val subTitleTextStyle: TextStyle
             MaterialTheme.typography.bodyMedium
     }
 
-
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3WindowSizeClassApi::class)
 @Composable
-internal fun App() = AppTheme {
+internal fun MyApp() = AppTheme {
     Napier.base(DebugAntilog())
-
     val viewModel by lazy {
         AppModule.homeViewModel
     }
-    var splash by remember { mutableStateOf(true) }
+
+    var splash: Boolean by remember { mutableStateOf(true) }
     if (splash) {
         SplashScreen {
             if (splash) {
@@ -143,7 +147,74 @@ internal fun App() = AppTheme {
         MainScreen(viewModel)
     }
 
+
 }
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3WindowSizeClassApi::class)
+@Composable
+internal fun App() {
+    var loadingResources: Boolean by remember { mutableStateOf(true) }
+
+    if (loadingResources) {
+        LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+    } else {
+        MyApp()
+    }
+
+    LaunchedEffect(Unit) {
+        loadMontserratFont()
+        if (loadingResources) {
+            loadingResources = false
+        }
+    }
+
+}
+
+
+private suspend fun loadMontserratFont() {
+    val sourceSansProBold = loadFontResource("SourceSansPro-Bold.otf")
+    val sourceSansProExtraLightIt = loadFontResource("SourceSansPro-ExtraLightIt.otf")
+    val sourceSansProLightIt = loadFontResource("SourceSansPro-LightIt.otf")
+    val sourceSansProSemiboldIt = loadFontResource("SourceSansPro-SemiboldIt.otf")
+    val sourceSansProBlack = loadFontResource("SourceSansPro-Black.otf")
+    val sourceSansProBoldIt = loadFontResource("SourceSansPro-BoldIt.otf")
+    val sourceSansProIt = loadFontResource("SourceSansPro-It.otf")
+    val sourceSansProRegular = loadFontResource("SourceSansPro-Regular.otf")
+    val sourceSansProBlackIt = loadFontResource("SourceSansPro-BlackIt.otf")
+    val sourceSansProExtraLight = loadFontResource("SourceSansPro-ExtraLight.otf")
+    val sourceSansProLight = loadFontResource("SourceSansPro-Light.otf")
+    val sourceSansProSemibold = loadFontResource("SourceSansPro-Semibold.otf")
+
+    AppFont.CustomBaseFont = FontFamily(
+        Font(identity = "SourceSansProBold", data = sourceSansProBold, weight = FontWeight.Bold),
+        //Font(identity = "SourceSansProExtraLightIt", data = sourceSansProExtraLightIt, weight = FontWeight.ExtraLight),
+        //Font(identity = "SourceSansProLightIt", data = sourceSansProLightIt, weight = FontWeight.Light),
+        //Font(identity = "SourceSansProSemiboldIt", data = sourceSansProSemiboldIt, weight = FontWeight.SemiBold),
+        Font(identity = "SourceSansProBlack", data = sourceSansProBlack, weight = FontWeight.Black),
+        //Font(identity = "SourceSansProBoldIt", data = sourceSansProBoldIt, weight = FontWeight.Bold),
+        //Font(identity = "SourceSansProIt", data = sourceSansProIt, weight = FontWeight.Normal),
+        Font(identity = "SourceSansProRegular", data = sourceSansProRegular, weight = FontWeight.Normal),
+        //Font(identity = "SourceSansProBlackIt", data = sourceSansProBlackIt, weight = FontWeight.Black),
+        Font(identity = "SourceSansProExtraLight", data = sourceSansProExtraLight, weight = FontWeight.ExtraLight),
+        Font(identity = "SourceSansProLight", data = sourceSansProLight, weight = FontWeight.Light),
+        Font(identity = "SourceSansProSemibold", data = sourceSansProSemibold, weight = FontWeight.SemiBold)
+    )
+
+}
+
+internal suspend fun loadFontResource(font: String) = loadResource("font/$font")
+@OptIn(ExperimentalResourceApi::class)
+@Composable
+internal fun loadDrawableResource(drawable: String) = org.jetbrains.compose.resources.painterResource(
+    "drawable/$drawable"
+)
+
+
+@OptIn(ExperimentalResourceApi::class)
+internal suspend fun loadResource(resourcePath: String): ByteArray {
+    return resource(resourcePath).readBytes()
+}
+
 
 fun ehPath(size: Size): Path {
     val rect = Rect(Offset.Zero, size)
@@ -524,7 +595,7 @@ internal fun App2() = AppTheme {
 
         LazyColumn() {
             item {
-                CardHorizontalPoster(data = data, onMouseover = {
+                CardPosterHorizontal(data = data, onMouseover = {
                     Napier.i { "onMouseover ${data.title} = $it" }
                 }) {
 

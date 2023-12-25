@@ -19,18 +19,15 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -52,19 +49,14 @@ import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.layout.positionInParent
-import androidx.compose.ui.layout.positionInRoot
-import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import pe.fernan.kmp.tmdb.ui.ext.pxToDp
 import kotlin.math.absoluteValue
 
 private const val AnimationDurationMillis = 500
@@ -411,10 +403,10 @@ fun AnimatedTab(
         )
     ),
     itemContentSelected: @Composable (text: String) -> Unit = { text ->
-        Text(text = text)
+        Text(text = text, fontFamily = MaterialTheme.typography.bodyMedium.fontFamily)
     },
     itemContent: @Composable (text: String) -> Unit = { text ->
-        Text(text = text)
+        Text(text = text, fontFamily = MaterialTheme.typography.bodyMedium.fontFamily)
     },
     onSelectedTab: (index: Int) -> Unit
 ) {

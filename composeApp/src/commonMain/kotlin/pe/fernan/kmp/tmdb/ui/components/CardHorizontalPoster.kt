@@ -32,7 +32,7 @@ import pe.fernan.kmp.tmdb.utils.Constant
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalComposeUiApi::class)
 @Composable
-fun CardHorizontalPoster(
+fun CardPosterHorizontal(
     data: Result,
     loading: Boolean = false,
     onMouseover: (String?) -> Unit,
