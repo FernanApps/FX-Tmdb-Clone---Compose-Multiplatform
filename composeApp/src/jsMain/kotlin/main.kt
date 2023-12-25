@@ -1,9 +1,5 @@
 
 import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.platform.Font
 import androidx.compose.ui.window.CanvasBasedWindow
 import org.jetbrains.skiko.wasm.onWasmReady
 import pe.fernan.kmp.tmdb.App
