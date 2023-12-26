@@ -4,6 +4,7 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.outlined.Bookmark
 import androidx.compose.material.icons.outlined.HeartBroken
 import androidx.compose.material.icons.outlined.List
@@ -58,8 +60,11 @@ import pe.fernan.kmp.tmdb.ui.ext.dpToPx
 import pe.fernan.kmp.tmdb.utils.Constant
 import pe.fernan.kmp.tmdb.utils.getDate
 
+interface DetailScreenClick {
+    fun onTrailerClick(url: String)
+}
 @Composable
-fun DetailScreen(data: Result) {
+fun DetailScreen(data: Result, events: DetailScreenClick) {
     Box(modifier = Modifier.fillMaxSize()) {
 
         val painterBackground =
@@ -211,6 +216,21 @@ fun DetailScreen(data: Result) {
 
                     }) {
                         Icon(Icons.Outlined.Star, contentDescription = "Mark List")
+                    }
+                    Spacer(modifier = Modifier.size(5.dp))
+                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.clickable {
+                        val url = "https://www.youtube.com/embed/LXb3EKWsInQ"
+                        events.onTrailerClick(url)
+
+                    }) {
+                        Icon(imageVector = Icons.Default.PlayArrow, "Play trailer", tint = textColor)
+                        Spacer(modifier = Modifier.size(5.dp))
+                        Text(
+                            text = "Play Trailer",
+                            fontWeight = FontWeight.SemiBold,
+                            color = textColor,
+                            maxLines = 4
+                        )
                     }
 
 

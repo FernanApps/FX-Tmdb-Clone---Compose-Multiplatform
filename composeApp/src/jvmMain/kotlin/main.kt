@@ -39,6 +39,8 @@ import androidx.compose.material3.TabPosition
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -57,6 +59,9 @@ import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import androidx.compose.ui.window.singleWindowApplication
+import dev.datlag.kcef.KCEF
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import pe.fernan.kmp.tmdb.App
 import pe.fernan.kmp.tmdb.domain.model.Result
 import pe.fernan.kmp.tmdb.theme.AppTheme
@@ -66,6 +71,8 @@ import pe.fernan.kmp.tmdb.ui.components.MultiSelector
 import pe.fernan.kmp.tmdb.ui.components.TextSwitch
 import pe.fernan.kmp.tmdb.utils.toModel
 import java.awt.Dimension
+import java.io.File
+import kotlin.math.max
 
 @Preview
 @Composable
@@ -76,17 +83,92 @@ fun PreviewItemScreen() {
 }
 
 
+@Composable
+fun ConfigWebView(onFinish: @Composable () -> Unit) {
+    var restartRequired by remember { mutableStateOf(false) }
+    var downloading by remember { mutableStateOf(0F) }
+    var initialized by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        withContext(Dispatchers.IO) {
+            KCEF.init(builder = {
+                installDir(File("kcef-bundle"))
+                progress {
+                    onDownloading {
+                        downloading = max(it, 0F)
+                    }
+                    onInitialized {
+                        initialized = true
+                    }
+                }
+                settings {
+                    cachePath = File("cache").absolutePath
+                }
+            }, onError = {
+                it?.printStackTrace()
+            }, onRestartRequired = {
+                restartRequired = true
+            })
+        }
+    }
+
+    if (restartRequired) {
+        Text(
+            text = "Por favor\nReiniciar la aplicacion",
+            color = MaterialTheme.colorScheme.error
+        )
+    } else {
+        if (initialized) {
+            onFinish()
+        } else {
+
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "Un momento...\nConfigurando ${"%.2f".format(downloading)}%",
+                    color = MaterialTheme.colorScheme.primary
+                )
+
+            }
+
+        }
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            KCEF.disposeBlocking()
+        }
+    }
+
+}
+
+
 @OptIn(ExperimentalMaterial3Api::class)
 fun main() = application {
+
+    /*
+    Window(title = "data.platform().name", onCloseRequest = ::exitApplication) {
+        ConfigWebView{
+            Test()
+        }
+    }
+
+
+     */
+
     Window(
         title = "FX-Tmdb - Compose Multiplatform",
         state = rememberWindowState(width = 800.dp, height = 600.dp),
         onCloseRequest = ::exitApplication,
     ) {
-        App()
-        //Napier.base(DebugAntilog())
-        //PreviewItemScreen()
-        "ASASAs".format("asas")
+        // Necessary for WebView :(
+        // It usually happens once
+        // https://github.com/KevinnZou/compose-webview-multiplatform/blob/main/README.desktop.md
+        ConfigWebView {
+            App()
+        }
     }
 }
 
@@ -119,10 +201,6 @@ fun main222() = application {
         }
     }
 }
-
-
-
-
 
 
 fun main111111() = application {
@@ -196,12 +274,6 @@ fun main2222() = application {
         App()
     }
 }
-
-
-
-
-
-
 
 
 fun main2aa() = application {

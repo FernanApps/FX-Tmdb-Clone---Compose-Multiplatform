@@ -103,9 +103,11 @@ sealed class Screen(
         title = "",
         icon = Icons.Default.Home
     ) {
+
         fun getObject(pathMap: Map<String, String>): NavigateRoute = getObject(ITEMS_NAVIGATE_ROUTE_ARGUMENT_KEY, pathMap)
 
     }
+
 
     data object Details : Screen(
         "details",
@@ -117,11 +119,23 @@ sealed class Screen(
 
     }
 
+    data object Youtube : Screen(
+        "youtube",
+        argKeys = listOf(YOUTUBE_URL_ARGUMENT_KEY),
+        title = "",
+        icon = Icons.Default.Home
+    ) {
+        fun passUrl(url: String) = pass(url.encodeBase64())
+        fun getUrl(pathMap: Map<String, String>): String = pathMap[YOUTUBE_URL_ARGUMENT_KEY]!!.decodeBase64String()
+
+    }
+
 
 }
 
 private const val ITEMS_NAVIGATE_ROUTE_ARGUMENT_KEY = "ITEMS_NAVIGATE_ROUTE_ARGUMENT_KEY"
 private const val DETAILS_RESULT_ARGUMENT_KEY = "DETAILS_RESULT_ARGUMENT_KEY"
+private const val YOUTUBE_URL_ARGUMENT_KEY = "YOUTUBE_URL_ARGUMENT_KEY"
 
 
 fun main() {

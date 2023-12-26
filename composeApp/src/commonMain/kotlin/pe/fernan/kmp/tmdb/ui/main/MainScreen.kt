@@ -76,7 +76,9 @@ import pe.fernan.kmp.tmdb.domain.model.TVSeriesListType
 import pe.fernan.kmp.tmdb.loadDrawableResource
 import pe.fernan.kmp.tmdb.paddingInternal
 import pe.fernan.kmp.tmdb.theme.LocalWindowSizeClass
+import pe.fernan.kmp.tmdb.ui.components.YoutubeDialogScreen
 import pe.fernan.kmp.tmdb.ui.details.DetailScreen
+import pe.fernan.kmp.tmdb.ui.details.DetailScreenClick
 import pe.fernan.kmp.tmdb.ui.home.HomeScreen
 import pe.fernan.kmp.tmdb.ui.home.HomeViewModel
 import pe.fernan.kmp.tmdb.ui.items.ItemsScreen
@@ -230,6 +232,7 @@ fun MainScreen(viewModel: HomeViewModel) {
                         NavHost(
                             navigator = navigator, initialRoute = Screen.Home.route
                         ) {
+
                             scene(route = Screen.Home.route) {
                                 HomeScreen(viewModel, onClickSearch = {
 
@@ -240,8 +243,34 @@ fun MainScreen(viewModel: HomeViewModel) {
                             }
                             scene(route = Screen.Details.route) { backStackEntry ->
                                 val result = Screen.Details.getObject(backStackEntry.pathMap)
-                                DetailScreen(result)
+                                var youtubeUrl by remember { mutableStateOf("") }
+                                var openDialog by remember { mutableStateOf(false) }
+                                DetailScreen(result, object : DetailScreenClick{
+                                    override fun onTrailerClick(url: String) {
+                                        youtubeUrl = url
+                                        openDialog = true
+                                        // It is not necessary to navigate since it is a dialog
+                                        //navigator.navigate(Screen.Youtube.passUrl(url))
+                                    }
+                                })
+                                if(openDialog){
+                                    YoutubeDialogScreen(youtubeUrl, onClose = {
+                                        openDialog = false
+                                    })
+                                }
+
+
+
+
                             }
+
+                            /*
+                            scene(route = Screen.Youtube.route) { backStackEntry ->
+                                val youtubeUrl = Screen.Youtube.getUrl(backStackEntry.pathMap)
+                                YoutubeDialogScreen(youtubeUrl)
+                            }
+
+                             */
 
                             scene(route = Screen.Items.route) { backStackEntry ->
                                 val navigateRoute = Screen.Items.getObject(backStackEntry.pathMap)

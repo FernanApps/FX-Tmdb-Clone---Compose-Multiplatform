@@ -153,6 +153,7 @@ internal fun MyApp() = AppTheme {
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3WindowSizeClassApi::class)
 @Composable
 internal fun App() {
+
     var loadingResources: Boolean by remember { mutableStateOf(true) }
 
     if (loadingResources) {

@@ -85,12 +85,16 @@ kotlin {
             implementation(libs.compose.uitooling)
             implementation(libs.kotlinx.coroutines.android)
             implementation(libs.ktor.client.okhttp)
+            api("io.github.kevinnzou:compose-webview-multiplatform:1.7.4")
+
         }
 
         jvmMain.dependencies {
             implementation(compose.desktop.common)
             implementation(compose.desktop.currentOs)
             implementation(libs.ktor.client.okhttp)
+            api("io.github.kevinnzou:compose-webview-multiplatform:1.7.4")
+
         }
 
         jsMain.dependencies {
@@ -135,6 +139,17 @@ android {
 
 compose.desktop {
     application {
+        // all your other configuration, etc
+        jvmArgs("--add-opens", "java.desktop/sun.awt=ALL-UNNAMED")
+        jvmArgs("--add-opens", "java.desktop/java.awt.peer=ALL-UNNAMED") // recommended but not necessary
+
+        System.setProperty("compose.interop.blending", "true")
+
+        if (System.getProperty("os.name").contains("Mac")) {
+            jvmArgs("--add-opens", "java.desktop/sun.lwawt=ALL-UNNAMED")
+            jvmArgs("--add-opens", "java.desktop/sun.lwawt.macosx=ALL-UNNAMED")
+        }
+
         mainClass = "MainKt"
 
         nativeDistributions {
