@@ -9,7 +9,8 @@ import androidx.compose.material3.Typography
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
-import androidx.compose.material3.windowsizeclass.WindowSizeClass
+import androidx.compose.material3.windowsizeclass.WindowHeightSizeClass
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -134,8 +135,17 @@ val FinalAppTypography = Typography(
     labelSmall = AppTypography.labelSmall.copy(fontFamily = AppFont.BaseFont)
 )
 
+enum class WindowSize {
+    Compact, Medium, Expanded
+}
+
 @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
-internal val LocalWindowSizeClass = staticCompositionLocalOf<WindowSizeClass> {
+internal val LocalWindowSizeHeight = staticCompositionLocalOf<WindowSize> {
+    error("CompositionLocal LocalWindowSizeClass not present")
+}
+
+@OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
+internal val LocalWindowSizeWidth = staticCompositionLocalOf<WindowSize> {
     error("CompositionLocal LocalWindowSizeClass not present")
 }
 
@@ -146,11 +156,23 @@ internal val LocalThemeIsDark = compositionLocalOf { mutableStateOf(true) }
 internal fun AppTheme(
     content: @Composable() () -> Unit
 ) {
+    val widthSize = when(calculateWindowSizeClass().widthSizeClass) {
+        WindowWidthSizeClass.Expanded -> WindowSize.Expanded
+        WindowWidthSizeClass.Medium -> WindowSize.Medium
+        else -> WindowSize.Compact
+    }
+    val heightSize = when(calculateWindowSizeClass().heightSizeClass) {
+        WindowHeightSizeClass.Expanded -> WindowSize.Expanded
+        WindowHeightSizeClass.Medium -> WindowSize.Medium
+        else -> WindowSize.Compact
+    }
+
     val systemIsDark = isSystemInDarkTheme()
     val isDarkState = remember { mutableStateOf(systemIsDark) }
     CompositionLocalProvider(
         LocalThemeIsDark provides isDarkState,
-        LocalWindowSizeClass provides calculateWindowSizeClass()
+        LocalWindowSizeWidth provides widthSize,
+        LocalWindowSizeHeight provides heightSize
     ) {
         val isDark by isDarkState
         SystemAppearance(!isDark)

@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -28,7 +27,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -43,18 +41,20 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import pe.fernan.kmp.tmdb.domain.model.Result
 import pe.fernan.kmp.tmdb.paddingInternal
-import pe.fernan.kmp.tmdb.theme.LocalWindowSizeClass
+import pe.fernan.kmp.tmdb.theme.LocalWindowSizeWidth
+import pe.fernan.kmp.tmdb.theme.WindowSize
 import pe.fernan.kmp.tmdb.titleTextStyle2
 import pe.fernan.kmp.tmdb.ui.common.VerticalScrollbarCommon
 import pe.fernan.kmp.tmdb.ui.common.rememberScrollbarAdapterCommon
 import pe.fernan.kmp.tmdb.ui.components.CardPoster
 import pe.fernan.kmp.tmdb.ui.components.DropDownMenuCustom
 import pe.fernan.kmp.tmdb.ui.components.cardPosterWidth
+import pe.fernan.kmp.tmdb.ui.grid.AdaptiveWithCountColumns
+import pe.fernan.kmp.tmdb.ui.grid.FixedSizeWithCountColumns
 import pe.fernan.kmp.tmdb.ui.home.HomeViewModel
 import pe.fernan.kmp.tmdb.ui.navigation.NavigateRoute
 import kotlin.random.Random
@@ -83,9 +83,11 @@ fun ItemsScreen(
     val titleWhereToWatch = "Where To Watch"
     val titleFilters = "Filters"
 
-
-    viewModel.getList(parentKey, routeKey)
-
+    var isViewModelCalled by remember { mutableStateOf(false) }
+    if (!isViewModelCalled) {
+        viewModel.getList(parentKey, routeKey)
+        isViewModelCalled = true
+    }
 
     var sortSelectedItemIndex by remember { mutableStateOf(0) }
     val sortItems = listOf(
@@ -246,7 +248,7 @@ fun ItemsScreen(
         TitleContent()
         Spacer(Modifier.size(paddingInternal))
 
-        if (LocalWindowSizeClass.current.widthSizeClass == WindowWidthSizeClass.Compact) {
+        if (LocalWindowSizeWidth.current == WindowSize.Compact) {
             Row(
                 modifier = Modifier.fillMaxSize(),
                 horizontalArrangement = Arrangement.Center
@@ -354,68 +356,5 @@ private fun CardDropMenu(
 }
 
 
-class AdaptiveWithCountColumns(private val minSize: Dp, val onCountColumns: (Int) -> Unit) :
-    GridCells {
-    init {
-        require(minSize > 0.dp) { "Provided min size $minSize should be larger than zero." }
-    }
 
-    private fun calculateCellsCrossAxisSizeImpl(
-        gridSize: Int,
-        slotCount: Int,
-        spacing: Int
-    ): List<Int> {
-        val gridSizeWithoutSpacing = gridSize - spacing * (slotCount - 1)
-        val slotSize = gridSizeWithoutSpacing / slotCount
-        val remainingPixels = gridSizeWithoutSpacing % slotCount
-        return List(slotCount) {
-            slotSize + if (it < remainingPixels) 1 else 0
-        }
-    }
 
-    override fun Density.calculateCrossAxisCellSizes(
-        availableSize: Int,
-        spacing: Int
-    ): List<Int> {
-        val count = maxOf((availableSize + spacing) / (minSize.roundToPx() + spacing), 1)
-        onCountColumns(count)
-        return calculateCellsCrossAxisSizeImpl(availableSize, count, spacing)
-    }
-
-    override fun hashCode(): Int {
-        return minSize.hashCode()
-    }
-
-    override fun equals(other: Any?): Boolean {
-        return other is GridCells.Adaptive
-    }
-}
-
-class FixedSizeWithCountColumns(val size: Dp, val onCountColumns: (Int) -> Unit) : GridCells {
-    init {
-        require(size > 0.dp) { "Provided size $size should be larger than zero." }
-    }
-
-    override fun Density.calculateCrossAxisCellSizes(
-        availableSize: Int,
-        spacing: Int
-    ): List<Int> {
-        val cellSize = size.roundToPx()
-        return if (cellSize + spacing < availableSize + spacing) {
-            val cellCount = (availableSize + spacing) / (cellSize + spacing)
-            onCountColumns(cellCount)
-            List(cellCount) { cellSize }
-        } else {
-            onCountColumns(1)
-            List(1) { availableSize }
-        }
-    }
-
-    override fun hashCode(): Int {
-        return size.hashCode()
-    }
-
-    override fun equals(other: Any?): Boolean {
-        return other is GridCells.FixedSize
-    }
-}

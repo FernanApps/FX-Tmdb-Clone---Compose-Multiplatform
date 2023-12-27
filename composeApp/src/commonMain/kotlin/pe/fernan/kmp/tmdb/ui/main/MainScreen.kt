@@ -41,9 +41,6 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
-import androidx.compose.material3.windowsizeclass.WindowHeightSizeClass
-import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
-import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -75,7 +72,9 @@ import pe.fernan.kmp.tmdb.domain.model.MovieListType
 import pe.fernan.kmp.tmdb.domain.model.TVSeriesListType
 import pe.fernan.kmp.tmdb.loadDrawableResource
 import pe.fernan.kmp.tmdb.paddingInternal
-import pe.fernan.kmp.tmdb.theme.LocalWindowSizeClass
+import pe.fernan.kmp.tmdb.theme.LocalWindowSizeHeight
+import pe.fernan.kmp.tmdb.theme.LocalWindowSizeWidth
+import pe.fernan.kmp.tmdb.theme.WindowSize
 import pe.fernan.kmp.tmdb.ui.components.YoutubeDialogScreen
 import pe.fernan.kmp.tmdb.ui.details.DetailScreen
 import pe.fernan.kmp.tmdb.ui.details.DetailScreenClick
@@ -86,6 +85,7 @@ import pe.fernan.kmp.tmdb.ui.navigation.KeyRoute
 import pe.fernan.kmp.tmdb.ui.navigation.KeyRoutes
 import pe.fernan.kmp.tmdb.ui.navigation.NavigateRoute
 import pe.fernan.kmp.tmdb.ui.navigation.Screen
+import pe.fernan.kmp.tmdb.ui.search.SearchScreen
 import pe.fernan.kmp.tmdb.utils.TimeExt.now
 
 
@@ -234,7 +234,8 @@ fun MainScreen(viewModel: HomeViewModel) {
                         ) {
 
                             scene(route = Screen.Home.route) {
-                                HomeScreen(viewModel, onClickSearch = {
+                                HomeScreen(viewModel, onClickSearch = { query ->
+                                    navigator.navigate(Screen.Search.pass(query))
 
                                 }, onItemClick = { result ->
                                     navigator.navigate(Screen.Details.passObject(result))
@@ -242,10 +243,12 @@ fun MainScreen(viewModel: HomeViewModel) {
                                 })
                             }
                             scene(route = Screen.Details.route) { backStackEntry ->
+                                Napier.d { "ToScreen-Details route ${backStackEntry.route}" }
+                                Napier.d { "ToScreen-Details pathMap ${backStackEntry.pathMap}" }
                                 val result = Screen.Details.getObject(backStackEntry.pathMap)
                                 var youtubeUrl by remember { mutableStateOf("") }
                                 var openDialog by remember { mutableStateOf(false) }
-                                DetailScreen(result, object : DetailScreenClick{
+                                DetailScreen(result, viewModel, object : DetailScreenClick {
                                     override fun onTrailerClick(url: String) {
                                         youtubeUrl = url
                                         openDialog = true
@@ -253,13 +256,11 @@ fun MainScreen(viewModel: HomeViewModel) {
                                         //navigator.navigate(Screen.Youtube.passUrl(url))
                                     }
                                 })
-                                if(openDialog){
+                                if (openDialog) {
                                     YoutubeDialogScreen(youtubeUrl, onClose = {
                                         openDialog = false
                                     })
                                 }
-
-
 
 
                             }
@@ -277,6 +278,13 @@ fun MainScreen(viewModel: HomeViewModel) {
                                 ItemsScreen(navigateRoute, viewModel, onItemSelected = { result ->
                                     navigator.navigate(Screen.Details.passObject(result))
 
+                                })
+                            }
+
+                            scene(route = Screen.Search.route) { backStackEntry ->
+                                val query = Screen.Search.getQuery(backStackEntry.pathMap)
+                                SearchScreen(query, viewModel, onItemSelected = { result ->
+                                    navigator.navigate(Screen.Details.passObject(result))
                                 })
                             }
 
@@ -298,20 +306,9 @@ fun MainScreen(viewModel: HomeViewModel) {
                     Expanded	≥ 840 dp	≥ 900 dp
 
                      */
-                    val windowSizeClass = calculateWindowSizeClass()
-                    when (windowSizeClass.heightSizeClass) {
-                        WindowHeightSizeClass.Compact -> {}
-                        WindowHeightSizeClass.Medium -> {}
-                        WindowHeightSizeClass.Expanded -> {}
-                    }
-                    when (windowSizeClass.widthSizeClass) {
-                        WindowWidthSizeClass.Compact -> {}
-                        WindowWidthSizeClass.Medium -> {}
-                        WindowWidthSizeClass.Expanded -> {}
-                    }
 
                     Text(
-                        "height = ${windowSizeClass.heightSizeClass}" + "\nwidth = ${windowSizeClass.widthSizeClass}",
+                        "height = ${LocalWindowSizeHeight.current}" + "\nwidth = ${LocalWindowSizeWidth.current}",
                         color = Color.White
                     )
                 }
@@ -472,7 +469,7 @@ fun Header(
         verticalAlignment = Alignment.CenterVertically,
     ) {
 
-        if (LocalWindowSizeClass.current.widthSizeClass == WindowWidthSizeClass.Expanded) {
+        if (LocalWindowSizeWidth.current == WindowSize.Expanded) {
             Image(
                 painter = loadDrawableResource("logo.xml"),
                 contentDescription = null,

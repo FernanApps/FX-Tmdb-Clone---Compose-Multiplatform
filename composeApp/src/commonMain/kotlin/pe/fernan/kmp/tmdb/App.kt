@@ -42,7 +42,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
-import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -83,7 +82,8 @@ import pe.fernan.kmp.tmdb.domain.model.Result
 import pe.fernan.kmp.tmdb.theme.AppFont
 import pe.fernan.kmp.tmdb.theme.AppTheme
 import pe.fernan.kmp.tmdb.theme.LocalThemeIsDark
-import pe.fernan.kmp.tmdb.theme.LocalWindowSizeClass
+import pe.fernan.kmp.tmdb.theme.LocalWindowSizeWidth
+import pe.fernan.kmp.tmdb.theme.WindowSize
 import pe.fernan.kmp.tmdb.ui.components.CardPosterHorizontal
 import pe.fernan.kmp.tmdb.ui.ext.dpToPx
 import pe.fernan.kmp.tmdb.ui.main.HeaderTitleItem
@@ -98,33 +98,40 @@ import pe.fernan.kmp.tmdb.utils.toModel
     ExperimentalResourceApi::class
 )
 val paddingInternal: Dp
-    @Composable get() = when (LocalWindowSizeClass.current.widthSizeClass) {
-        WindowWidthSizeClass.Expanded -> 40.dp
-        WindowWidthSizeClass.Medium -> 25.dp
+    @Composable get() = when (LocalWindowSizeWidth.current) {
+        WindowSize.Expanded -> 40.dp
+        WindowSize.Medium -> 25.dp
         else -> // WindowWidthSizeClass.Compact
             15.dp
     }
 
 val titleTextStyle: TextStyle
-    @Composable get() = when (LocalWindowSizeClass.current.widthSizeClass) {
-        WindowWidthSizeClass.Expanded -> MaterialTheme.typography.displayMedium
-        WindowWidthSizeClass.Medium -> MaterialTheme.typography.headlineLarge
+    @Composable get() = when (LocalWindowSizeWidth.current) {
+        WindowSize.Expanded -> MaterialTheme.typography.displayMedium
+        WindowSize.Medium -> MaterialTheme.typography.headlineLarge
         else -> // WindowWidthSizeClass.Compact
             MaterialTheme.typography.headlineSmall
     }
 
 val titleTextStyle2: TextStyle
-    @Composable get() = when (LocalWindowSizeClass.current.widthSizeClass) {
-        WindowWidthSizeClass.Expanded -> MaterialTheme.typography.displaySmall
-        WindowWidthSizeClass.Medium -> MaterialTheme.typography.headlineMedium
+    @Composable get() = when (LocalWindowSizeWidth.current) {
+        WindowSize.Expanded -> MaterialTheme.typography.displaySmall
+        WindowSize.Medium -> MaterialTheme.typography.headlineMedium
         else -> // WindowWidthSizeClass.Compact
             MaterialTheme.typography.headlineSmall
     }
 
+val titleTextStyle3: TextStyle
+    @Composable get() = when (LocalWindowSizeWidth.current) {
+        WindowSize.Expanded -> MaterialTheme.typography.displaySmall
+        WindowSize.Medium -> MaterialTheme.typography.headlineMedium
+        else -> MaterialTheme.typography.bodyMedium
+    }
+
 val subTitleTextStyle: TextStyle
-    @Composable get() = when (LocalWindowSizeClass.current.widthSizeClass) {
-        WindowWidthSizeClass.Expanded -> MaterialTheme.typography.headlineMedium
-        WindowWidthSizeClass.Medium -> MaterialTheme.typography.titleMedium
+    @Composable get() = when (LocalWindowSizeWidth.current) {
+        WindowSize.Expanded -> MaterialTheme.typography.headlineMedium
+        WindowSize.Medium -> MaterialTheme.typography.titleMedium
         else -> // WindowWidthSizeClass.Compact
             MaterialTheme.typography.bodyMedium
     }
@@ -150,16 +157,20 @@ internal fun MyApp() = AppTheme {
 
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3WindowSizeClassApi::class)
 @Composable
 internal fun App() {
-
+    LoadingResources{
+        MyApp()
+    }
+}
+@Composable
+internal fun LoadingResources(onLoading: @Composable () -> Unit) {
     var loadingResources: Boolean by remember { mutableStateOf(true) }
 
     if (loadingResources) {
         LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
     } else {
-        MyApp()
+        onLoading()
     }
 
     LaunchedEffect(Unit) {
@@ -168,7 +179,6 @@ internal fun App() {
             loadingResources = false
         }
     }
-
 }
 
 

@@ -4,7 +4,6 @@ import androidx.compose.foundation.HorizontalScrollbar
 import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -49,11 +48,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.application
@@ -63,25 +59,15 @@ import dev.datlag.kcef.KCEF
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import pe.fernan.kmp.tmdb.App
+import pe.fernan.kmp.tmdb.LoadingResources
 import pe.fernan.kmp.tmdb.domain.model.Result
 import pe.fernan.kmp.tmdb.theme.AppTheme
-import pe.fernan.kmp.tmdb.ui.components.CardPosterHorizontal
-import pe.fernan.kmp.tmdb.ui.components.CircularProgressbar1
 import pe.fernan.kmp.tmdb.ui.components.MultiSelector
 import pe.fernan.kmp.tmdb.ui.components.TextSwitch
 import pe.fernan.kmp.tmdb.utils.toModel
 import java.awt.Dimension
 import java.io.File
 import kotlin.math.max
-
-@Preview
-@Composable
-fun PreviewItemScreen() {
-    AppTheme {
-
-    }
-}
-
 
 @Composable
 fun ConfigWebView(onFinish: @Composable () -> Unit) {
@@ -147,63 +133,23 @@ fun ConfigWebView(onFinish: @Composable () -> Unit) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 fun main() = application {
-
-    /*
-    Window(title = "data.platform().name", onCloseRequest = ::exitApplication) {
-        ConfigWebView{
-            Test()
-        }
-    }
-
-
-     */
-
     Window(
         title = "FX-Tmdb - Compose Multiplatform",
         state = rememberWindowState(width = 800.dp, height = 600.dp),
         onCloseRequest = ::exitApplication,
     ) {
-        // Necessary for WebView :(
+        // Necessary for WebView :( for youtube embed
         // It usually happens once
         // https://github.com/KevinnZou/compose-webview-multiplatform/blob/main/README.desktop.md
         ConfigWebView {
             App()
+
         }
     }
 }
-
 
 
 fun main222() = application {
-    Window(
-        title = "FX-Tmdb - Compose Multiplatform",
-        state = rememberWindowState(width = 800.dp, height = 600.dp),
-        onCloseRequest = ::exitApplication,
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(color = Color.Gray),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            CircularProgressbar1(
-                size = 35.dp,
-                indicatorThickness = 2.5.dp,
-                backgroundInternalStroke = 1.5.dp,
-                textStyle = TextStyle(
-                    fontSize = 10.sp,
-                    color = Color.White,
-                    fontWeight = FontWeight.SemiBold
-                ),
-                initialValue = 30f
-            )
-        }
-    }
-}
-
-
-fun main111111() = application {
     Window(
         title = "FX-Tmdb - Compose Multiplatform",
         state = rememberWindowState(width = 800.dp, height = 600.dp),
@@ -238,40 +184,37 @@ fun main111111() = application {
         "ES"
       ]
     }"""
+        val data = json.toModel<Result>()
 
-        AppTheme {
-            val data = json.toModel<Result>()
-            Box(
-                modifier = Modifier.fillMaxSize().background(Color.White),
-                contentAlignment = Alignment.Center
-            ) {
+        ConfigWebView {
+            LoadingResources {
+                AppTheme {
+                    val result = data
+                    var youtubeUrl by remember { mutableStateOf("") }
+                    var openDialog by remember { mutableStateOf(false) }
+                    /*
 
-                LazyColumn() {
-                    item {
-                        CardPosterHorizontal(data = data, onMouseover = {
-
-                        }) {
-
+                    DetailScreen(result, object : DetailScreenClick {
+                        override fun onTrailerClick(url: String) {
+                            youtubeUrl = url
+                            openDialog = true
+                            // It is not necessary to navigate since it is a dialog
+                            //navigator.navigate(Screen.Youtube.passUrl(url))
                         }
+                    })
+                    if (openDialog) {
+                        YoutubeDialogScreen(youtubeUrl, onClose = {
+                            openDialog = false
+                        })
                     }
+
+                     */
+
                 }
-
             }
-
         }
 
-    }
-}
 
-
-fun main2222() = application {
-    Window(
-        title = "FX-Tmdb - Compose Multiplatform",
-        state = rememberWindowState(width = 800.dp, height = 600.dp),
-        onCloseRequest = ::exitApplication,
-    ) {
-        window.minimumSize = Dimension(350, 600)
-        App()
     }
 }
 

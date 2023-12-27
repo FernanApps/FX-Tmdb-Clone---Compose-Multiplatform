@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 
 
 @Serializable
-class Result(
+data class Result(
     @SerialName("adult")
     val adult: Boolean?,
     @SerialName("backdrop_path")
@@ -44,6 +44,8 @@ class Result(
     val firstAirDate: String?,
     @SerialName("origin_country")
     val originCountry: List<String?>?,
+
+
 
 ){
     constructor(id: Int): this(false,"",id,"","","","","","", listOf<Int>(),0.0,"",false,0.0,0,"","","",

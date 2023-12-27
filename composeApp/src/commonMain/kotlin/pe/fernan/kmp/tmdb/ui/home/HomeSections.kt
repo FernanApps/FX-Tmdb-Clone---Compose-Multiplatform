@@ -1,3 +1,4 @@
+
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -16,7 +17,6 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -40,7 +40,8 @@ import pe.fernan.kmp.tmdb.domain.model.Result
 import pe.fernan.kmp.tmdb.loadDrawableResource
 import pe.fernan.kmp.tmdb.paddingInternal
 import pe.fernan.kmp.tmdb.subTitleTextStyle
-import pe.fernan.kmp.tmdb.theme.LocalWindowSizeClass
+import pe.fernan.kmp.tmdb.theme.LocalWindowSizeWidth
+import pe.fernan.kmp.tmdb.theme.WindowSize
 import pe.fernan.kmp.tmdb.ui.common.HorizontalScrollbarCommon
 import pe.fernan.kmp.tmdb.ui.common.defaultScrollbarStyleCommon
 import pe.fernan.kmp.tmdb.ui.common.rememberScrollbarAdapterCommon
@@ -177,7 +178,7 @@ fun HomeSection(
                 )
                 Spacer(Modifier.width(20.dp))
 
-                if (LocalWindowSizeClass.current.widthSizeClass == WindowWidthSizeClass.Compact) {
+                if (LocalWindowSizeWidth.current == WindowSize.Compact) {
 
                     DropDownMenuCustom(
                         width = 175.dp,

@@ -89,7 +89,7 @@ fun CardPosterHorizontal(
 
                     }
                 ) {
-                    val backDrop = Constant.IMAGE_BASE_PATH_CARD_HORIZONTAL + data.backdropPath
+                    val backDrop = Constant.TMDB_IMAGE_BASE_PATH_CARD_HORIZONTAL + data.backdropPath
                     val painter = rememberImagePainter(backDrop)
                     Image(
                         painter = painter,

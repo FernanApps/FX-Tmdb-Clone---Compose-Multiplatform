@@ -4,11 +4,11 @@ package pe.fernan.kmp.tmdb.ui.navigation
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.ui.graphics.vector.ImageVector
-import io.ktor.util.decodeBase64String
-import io.ktor.util.encodeBase64
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import pe.fernan.kmp.tmdb.domain.model.Result
+import pe.fernan.kmp.tmdb.utils.kase64.base64UrlDecoded
+import pe.fernan.kmp.tmdb.utils.kase64.base64UrlEncoded
 import pe.fernan.kmp.tmdb.utils.toJson
 import pe.fernan.kmp.tmdb.utils.toModel
 
@@ -89,9 +89,9 @@ sealed class Screen(
 
 
     inline fun <reified T> parser(model: T): String =
-        model.toJson().encodeBase64()
+        model.toJson().base64UrlEncoded
 
-    inline fun <reified T> generate(text: String): T = text.decodeBase64String().toModel<T>()
+    inline fun <reified T> generate(text: String): T = text.base64UrlDecoded.toModel<T>()
 
 
     data object Splash : Screen("splash", title = "Tmdb Kmp", icon = Icons.Default.Home)
@@ -119,14 +119,13 @@ sealed class Screen(
 
     }
 
-    data object Youtube : Screen(
-        "youtube",
-        argKeys = listOf(YOUTUBE_URL_ARGUMENT_KEY),
+    data object Search : Screen(
+        "search",
+        argKeys = listOf(SEARCH_QUERY_ARGUMENT_KEY),
         title = "",
         icon = Icons.Default.Home
     ) {
-        fun passUrl(url: String) = pass(url.encodeBase64())
-        fun getUrl(pathMap: Map<String, String>): String = pathMap[YOUTUBE_URL_ARGUMENT_KEY]!!.decodeBase64String()
+        fun getQuery(pathMap: Map<String, String>): String = pathMap[SEARCH_QUERY_ARGUMENT_KEY]!!
 
     }
 
@@ -135,15 +134,12 @@ sealed class Screen(
 
 private const val ITEMS_NAVIGATE_ROUTE_ARGUMENT_KEY = "ITEMS_NAVIGATE_ROUTE_ARGUMENT_KEY"
 private const val DETAILS_RESULT_ARGUMENT_KEY = "DETAILS_RESULT_ARGUMENT_KEY"
-private const val YOUTUBE_URL_ARGUMENT_KEY = "YOUTUBE_URL_ARGUMENT_KEY"
+private const val SEARCH_QUERY_ARGUMENT_KEY = "SEARCH_QUERY_ARGUMENT_KEY"
 
 
 fun main() {
-    val text = "Hello, Kotlin!"
-    val text64 = text.encodeBase64()
-    println(text64)
-    println(text64.decodeBase64String())
-
+    val text = Screen.Details.route
+    println(text)
 }
 
 

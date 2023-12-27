@@ -166,7 +166,7 @@ fun HomeScreen(viewModel: HomeViewModel, onClickSearch: (String) -> Unit, onItem
                 HomeSection(
                     title = discoverTitle,
                     titleColor = Color.White,
-                    background = Constant.IMAGE_BASE_PATH_CARD_HORIZONTAL_LARGE + homeState.discoverBackgroundPath,
+                    background = Constant.TMDB_IMAGE_BASE_PATH_CARD_HORIZONTAL_LARGE + homeState.discoverBackgroundPath,
                     backgroundGradient = true,
                     tabItems = discoverKeys.values.toList(),
                     tabSelectedItemIndex = discoverSelectedItemIndexTab,
@@ -313,7 +313,7 @@ fun SectionInit(
 ) {
     Box(modifier = Modifier.fillMaxWidth()) {
 
-        val backDrop = Constant.IMAGE_BASE_PATH_CARD_HORIZONTAL_SUPER_LARGE + backgroundPath
+        val backDrop = Constant.TMDB_IMAGE_BASE_PATH_CARD_HORIZONTAL_SUPER_LARGE + backgroundPath
         val painter = rememberImagePainter(backDrop)
         var sizeImage by remember { mutableStateOf(IntSize.Zero) }
 

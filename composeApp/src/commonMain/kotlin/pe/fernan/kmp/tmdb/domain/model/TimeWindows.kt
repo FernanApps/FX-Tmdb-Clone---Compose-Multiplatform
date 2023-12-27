@@ -6,7 +6,16 @@ enum class TimeWindows(val value: String) {
 }
 enum class MediaType(val value: String) {
     MOVIE("movie"),
-    TV("tv")
+    TV("tv"),
+    /*
+    TEST :(
+    PERSON("person"),
+    COLLECTION("collection"),
+    KEYWORD("keyword"),
+    COMPANY("company"),
+    NETWORK("network"),
+
+     */
 }
 
 enum class MovieListType(val value: String) {

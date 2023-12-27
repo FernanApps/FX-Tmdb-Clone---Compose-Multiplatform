@@ -5,8 +5,11 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -28,6 +31,7 @@ import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -49,29 +53,99 @@ import com.kmpalette.color
 import com.kmpalette.loader.rememberPainterLoader
 import com.kmpalette.rememberPaletteState
 import com.seiko.imageloader.rememberImagePainter
+import io.github.aakira.napier.Napier
+import pe.fernan.kmp.tmdb.domain.model.MediaType
 import pe.fernan.kmp.tmdb.domain.model.Result
 import pe.fernan.kmp.tmdb.paddingInternal
-import pe.fernan.kmp.tmdb.titleTextStyle2
+import pe.fernan.kmp.tmdb.theme.LocalWindowSizeWidth
+import pe.fernan.kmp.tmdb.theme.WindowSize
+import pe.fernan.kmp.tmdb.titleTextStyle3
 import pe.fernan.kmp.tmdb.ui.components.CircularProgressbar1
 import pe.fernan.kmp.tmdb.ui.components.cardPosterHeight
 import pe.fernan.kmp.tmdb.ui.components.cardPosterWidth
 import pe.fernan.kmp.tmdb.ui.components.placeholderPainter
 import pe.fernan.kmp.tmdb.ui.ext.dpToPx
+import pe.fernan.kmp.tmdb.ui.home.HomeViewModel
 import pe.fernan.kmp.tmdb.utils.Constant
 import pe.fernan.kmp.tmdb.utils.getDate
+import pe.fernan.kmp.tmdb.utils.toJson
 
 interface DetailScreenClick {
     fun onTrailerClick(url: String)
 }
+
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun DetailScreen(data: Result, events: DetailScreenClick) {
+fun DetailScreen(data: Result, viewModel: HomeViewModel, events: DetailScreenClick) {
+    val detailsState by viewModel.detailsState.collectAsState()
+    var youtubeUrl: String? by remember { mutableStateOf(null) }
+
+    var isViewModelCalled by remember { mutableStateOf(false) }
+    if (!isViewModelCalled) {
+        Napier.d { "DetailsScreen data ::: \n${data.toJson()}" }
+        viewModel.getResult(data.mediaType!!, data.id!!)
+        isViewModelCalled = true
+    }
+
+
+    LaunchedEffect(detailsState) {
+        youtubeUrl = if (detailsState.mediaType == MediaType.TV) {
+            val videoResult = detailsState.tvSeries
+                ?.videos?.results?.filter { it?.site == "YouTube" }
+
+            val typesAndKeys = videoResult?.mapNotNull {
+                it?.type ?: return@mapNotNull null
+                it?.key ?: return@mapNotNull null
+                it.type to it.key
+            }?.toMap() ?: emptyMap()
+
+            val keyVideoYoutube = if(typesAndKeys.containsKey("Trailer")){
+                typesAndKeys["Trailer"]
+            } else {
+                typesAndKeys["Teaser"]
+            }
+            keyVideoYoutube?.let { Constant.getYoutubeEmbedUrl(videoKey = it) }
+
+        } else {
+            val videoResult = detailsState.movie
+                ?.videos?.results?.filter { it?.site == "YouTube" }
+
+            val typesAndKeys = videoResult?.mapNotNull {
+                it?.type ?: return@mapNotNull null
+                it?.key ?: return@mapNotNull null
+                it.type to it.key
+            }?.toMap() ?: emptyMap()
+
+            val keyVideoYoutube = if(typesAndKeys.containsKey("Trailer")){
+                typesAndKeys["Trailer"]
+            } else {
+                typesAndKeys["Teaser"]
+            }
+            keyVideoYoutube?.let { Constant.getYoutubeEmbedUrl(videoKey = it) }
+        }
+    }
+
+
+
+
     Box(modifier = Modifier.fillMaxSize()) {
 
         val painterBackground =
-            rememberImagePainter(Constant.IMAGE_BASE_PATH_CARD_HORIZONTAL_LARGE + data.backdropPath)
+            rememberImagePainter(Constant.TMDB_IMAGE_BASE_PATH_CARD_HORIZONTAL_LARGE + data.backdropPath)
+
+        val cardPosterWidth = when (LocalWindowSizeWidth.current) {
+            WindowSize.Compact -> cardPosterWidth * 0.75f
+            WindowSize.Medium -> cardPosterWidth
+            WindowSize.Expanded -> cardPosterWidth * 1.25f
+        }
+        val cardPosterHeight = when (LocalWindowSizeWidth.current) {
+            WindowSize.Compact -> cardPosterHeight * 0.95f
+            WindowSize.Medium -> cardPosterHeight * 1.25f
+            WindowSize.Expanded -> cardPosterHeight * 1.5f
+        }
 
         val painterPoster = rememberImagePainter(
-            Constant.IMAGE_BASE_PATH_CARD + data.posterPath,
+            Constant.TMDB_IMAGE_BASE_PATH_CARD + data.posterPath,
             placeholderPainter = {
                 placeholderPainter(
                     width = cardPosterWidth.dpToPx(),
@@ -109,7 +183,7 @@ fun DetailScreen(data: Result, events: DetailScreenClick) {
                 .padding(paddingInternal)
         ) {
             Card(
-                modifier = Modifier.width(cardPosterWidth * 1.25f).height(cardPosterHeight * 1.5f)
+                modifier = Modifier.width(cardPosterWidth).height(cardPosterHeight)
             ) {
 
                 Image(
@@ -127,12 +201,12 @@ fun DetailScreen(data: Result, events: DetailScreenClick) {
                 Text(
                     text = buildAnnotatedString {
                         withStyle(
-                            titleTextStyle2.copy(fontWeight = FontWeight.SemiBold).toSpanStyle()
+                            titleTextStyle3.copy(fontWeight = FontWeight.SemiBold).toSpanStyle()
                         ) {
                             append(data.title ?: data.name ?: "")
                         }
                         withStyle(
-                            titleTextStyle2.copy(fontWeight = FontWeight.Light).toSpanStyle()
+                            titleTextStyle3.copy(fontWeight = FontWeight.Light).toSpanStyle()
                         ) {
                             val year = data.date?.let { getDate(it)?.first }
                             append(if (year != null) " ($year)" else "")
@@ -141,10 +215,10 @@ fun DetailScreen(data: Result, events: DetailScreenClick) {
                     color = textColor
                 )
                 Spacer(modifier = Modifier.size(2.5.dp))
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                FlowRow(verticalArrangement = Arrangement.Center) {
                     Text(
                         // PG-13
-                        text = "",
+                        text = "PG-21",
                         color = Color.LightGray,
                         modifier = Modifier.border(
                             width = 0.5.dp,
@@ -165,7 +239,7 @@ fun DetailScreen(data: Result, events: DetailScreenClick) {
                     )
                 }
                 Spacer(modifier = Modifier.size(15.dp))
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                FlowRow(verticalArrangement = Arrangement.Center) {
                     val progress = (data.voteAverage?.times(10f))?.toFloat() ?: 0f
                     val colorProgress = when (progress) {
                         in 1f..70f -> Color(0xFFD2D531)
@@ -193,7 +267,8 @@ fun DetailScreen(data: Result, events: DetailScreenClick) {
                         fontWeight = FontWeight.SemiBold,
                         color = textColor,
                         lineHeight = 10.sp,
-                        fontSize = 12.sp
+                        fontSize = 12.sp,
+                        modifier = Modifier.align(Alignment.CenterVertically)
                     )
                     Spacer(modifier = Modifier.size(10.5.dp))
 
@@ -218,21 +293,29 @@ fun DetailScreen(data: Result, events: DetailScreenClick) {
                         Icon(Icons.Outlined.Star, contentDescription = "Mark List")
                     }
                     Spacer(modifier = Modifier.size(5.dp))
-                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.clickable {
-                        val url = "https://www.youtube.com/embed/LXb3EKWsInQ"
-                        events.onTrailerClick(url)
 
-                    }) {
-                        Icon(imageVector = Icons.Default.PlayArrow, "Play trailer", tint = textColor)
-                        Spacer(modifier = Modifier.size(5.dp))
-                        Text(
-                            text = "Play Trailer",
-                            fontWeight = FontWeight.SemiBold,
-                            color = textColor,
-                            maxLines = 4
-                        )
+                    if (youtubeUrl != null && youtubeUrl?.isNotEmpty() == true) {
+
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.align(Alignment.CenterVertically)
+                                .clickable {
+                                    events.onTrailerClick(youtubeUrl!!)
+                                }) {
+                            Icon(
+                                imageVector = Icons.Default.PlayArrow,
+                                "Play trailer",
+                                tint = textColor
+                            )
+                            Spacer(modifier = Modifier.size(5.dp))
+                            Text(
+                                text = "Play Trailer",
+                                fontWeight = FontWeight.SemiBold,
+                                color = textColor,
+                                maxLines = 4
+                            )
+                        }
                     }
-
 
                 }
                 Spacer(modifier = Modifier.size(15.dp))

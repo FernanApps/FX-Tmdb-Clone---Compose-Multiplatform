@@ -6,7 +6,10 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -26,12 +29,15 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.seiko.imageloader.rememberImagePainter
 import pe.fernan.kmp.tmdb.domain.model.Result
+import pe.fernan.kmp.tmdb.paddingInternal
 import pe.fernan.kmp.tmdb.ui.ext.dpToPx
 import pe.fernan.kmp.tmdb.utils.Constant
+import pe.fernan.kmp.tmdb.utils.getDateFormat
 
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -82,7 +88,7 @@ fun CardPoster(
                         }
                     ) {
 
-                        val backDrop = Constant.IMAGE_BASE_PATH_CARD + data.posterPath
+                        val backDrop = Constant.TMDB_IMAGE_BASE_PATH_CARD + data.posterPath
                         val painter = rememberImagePainter(backDrop, placeholderPainter = {
                             placeholderPainter(
                                 width = cardPosterWidth.dpToPx(),
@@ -154,6 +160,72 @@ fun CardPoster(
     }
 
 }
+
+@Composable
+fun CardPoster2(
+    modifier: Modifier = Modifier,
+    data: Result,
+    loading: Boolean = false,
+    onClick: (Result) -> Unit
+) {
+    val cardPosterHeight = cardPosterHeight * 0.8f
+    val cardPosterWidth = cardPosterWidth * 0.7f
+
+    Row(modifier = Modifier.fillMaxWidth().height(cardPosterHeight).clickable {
+        onClick(data)
+    }) {
+
+
+        if (loading) {
+            Box(modifier.fillMaxHeight().width(cardPosterWidth))
+        } else {
+            val backDrop = Constant.TMDB_IMAGE_BASE_PATH_CARD + data.posterPath
+            val painter = rememberImagePainter(backDrop, placeholderPainter = {
+                placeholderPainter(
+                    width = cardPosterWidth.dpToPx(),
+                    height = cardPosterHeight.dpToPx()
+                )
+            })
+            Image(
+                painter = painter,
+                contentDescription = "image",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxHeight().width(cardPosterWidth)
+            )
+        }
+
+        Column(
+            modifier = modifier.fillMaxSize().padding(paddingInternal / 2)
+        ) {
+            Text(
+                text = data.title ?: data.name ?: "",
+                fontWeight = FontWeight.Bold,
+                style = MaterialTheme.typography.labelLarge,
+                maxLines = 3,
+            )
+            Spacer(modifier = Modifier.height(2.5.dp))
+            Text(
+                text = getDateFormat(data.releaseDate ?: data?.firstAirDate ?: ""),
+                color = Color.Gray,
+                style = MaterialTheme.typography.labelLarge,
+                maxLines = 1,
+                )
+            Spacer(modifier = Modifier.height(7.5.dp))
+            Text(
+                text = data.overview ?: "",
+                style = MaterialTheme.typography.labelLarge,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
+
+
+            )
+
+
+        }
+    }
+}
+
+
 
 @Composable
 fun placeholderPainter(height: Float, width: Float): Painter {
