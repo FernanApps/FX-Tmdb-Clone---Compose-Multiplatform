@@ -10,6 +10,10 @@ import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -56,3 +60,9 @@ internal actual fun HorizontalScrollbarCommon(
     interactionSource: MutableInteractionSource
 ) = Unit
 
+
+/**
+ * Ios
+ *
+ *
+ */

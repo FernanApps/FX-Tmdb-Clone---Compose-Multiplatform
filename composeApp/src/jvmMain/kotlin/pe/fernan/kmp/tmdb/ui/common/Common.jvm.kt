@@ -19,6 +19,9 @@ import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.platform.LocalWindowInfo
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import pe.fernan.kmp.tmdb.ui.ext.pxToDp
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -93,4 +96,8 @@ internal actual fun HorizontalScrollbarCommon(
     style as androidx.compose.foundation.ScrollbarStyle,
     interactionSource
 )
+
+
+
+
 

@@ -59,7 +59,6 @@ import dev.datlag.kcef.KCEF
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import pe.fernan.kmp.tmdb.App
-import pe.fernan.kmp.tmdb.LoadingResources
 import pe.fernan.kmp.tmdb.domain.model.Result
 import pe.fernan.kmp.tmdb.theme.AppTheme
 import pe.fernan.kmp.tmdb.ui.components.MultiSelector
@@ -187,7 +186,7 @@ fun main222() = application {
         val data = json.toModel<Result>()
 
         ConfigWebView {
-            LoadingResources {
+            //LoadingResources {
                 AppTheme {
                     val result = data
                     var youtubeUrl by remember { mutableStateOf("") }
@@ -211,7 +210,7 @@ fun main222() = application {
                      */
 
                 }
-            }
+            //}
         }
 
 

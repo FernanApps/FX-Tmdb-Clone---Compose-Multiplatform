@@ -1,3 +1,4 @@
+//import jdk.tools.jlink.resources.plugins
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 plugins {
@@ -32,7 +33,7 @@ kotlin {
             implementation(compose.materialIconsExtended)
             @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
             implementation(compose.components.resources)
-
+            
             //api(compose.foundation)
             api(compose.animation)
             val precompose_version = "1.5.10"

@@ -24,10 +24,10 @@ class TmdbRepositoryImp(private val api: TmdbClientApi) : TmdbRepository {
         fixMediaTypeIfNotFound(mediaType, api.getDiscoverAll(mediaType).results)
 
     override suspend fun getMovieList(movieListType: String): List<Result>? =
-        api.getMovieList(movieListType).results?.filterNotNull()
+        fixMediaTypeIfNotFound(MediaType.MOVIE.value, api.getMovieList(movieListType).results)
 
     override suspend fun getTVSeriesList(tvSeriesListType: String): List<Result>? =
-        api.getTVSeriesList(tvSeriesListType).results?.filterNotNull()
+        fixMediaTypeIfNotFound(MediaType.TV.value, api.getTVSeriesList(tvSeriesListType).results)
 
     override suspend fun getList(keyType: String, key: String): List<Result>? =
         api.getList(keyType, key).results?.filterNotNull()

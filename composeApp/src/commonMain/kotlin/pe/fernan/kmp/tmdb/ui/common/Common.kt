@@ -94,3 +94,6 @@ internal expect fun HorizontalScrollbarCommon(
 
 
 internal expect fun defaultScrollbarStyleCommon(background: String?): Any
+
+
+// https://proandroiddev.com/custom-font-magic-in-compose-multiplatform-unlock-your-creativity-dcd0c9fa7756

@@ -101,8 +101,7 @@ private val AppShapes = Shapes(
 object AppFont {
     var CustomBaseFont: FontFamily? = null
     val BaseFont
-        get() = CustomBaseFont
-            ?: throw Exception("Please load first fonts resources")
+        get() = CustomBaseFont ?: FontFamily.SansSerif
 }
 
 private val AppTypography = Typography(
